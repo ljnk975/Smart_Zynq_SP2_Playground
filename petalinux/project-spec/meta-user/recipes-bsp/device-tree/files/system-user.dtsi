@@ -1,0 +1,83 @@
+/include/ "system-conf.dtsi"
+
+/ {
+    usb_phy0: usb_phy@0 {
+        compatible = "ulpi-phy";
+        #phy-cells = <0>;
+        reg = <0xe0002000 0x1000>;
+        view-port = <0x0170>;
+        drv-vbus;
+    };
+
+    backlight0: backlight {
+        compatible = "gpio-backlight";
+        gpios = <&gpio0 56 0>;
+        default-on;
+        status = "okay";
+    };
+
+    gpio-keys {
+        compatible = "gpio-keys";
+
+        up {
+            label = "GPIO Key UP";
+            linux,code = <103>;
+            gpios = <&gpio0 57 0>;
+        };
+
+        down {
+            label = "GPIO Key DOWN";
+            linux,code = <108>;
+            gpios = <&gpio0 58 0>;
+        };
+    };
+	
+    leds {
+        compatible = "gpio-leds";
+
+        heartbeat_led {
+            label = "system:green:ok";
+            gpios = <&gpio0 59 0>;
+            default-state = "on";
+            linux,default-trigger = "heartbeat";
+        };
+    };
+
+};
+
+&usb0 {
+    dr_mode = "host";
+    usb-phy = <&usb_phy0>;
+};
+
+&spi0 {
+    st7789v@0 {
+        compatible = "sitronix,st7789v";
+        reg = <0>;
+        spi-max-frequency = <32000000>;
+
+        // Required GPIOs
+        dc-gpios = <&gpio0 54 1>;
+        reset-gpios = <&gpio0 55 1>;
+
+        // Optional Properties
+        backlight = <&backlight0>;
+
+        // Panels usually need rotation and size configuration
+        // rotation = <270>;
+        width = <240>;
+        height = <240>;
+    };
+};
+
+&gem0 {
+        phy-mode = "rgmii-id";
+};
+
+&ps7_ethernet_0_mdio {
+    phy1: ethernet-phy@1 {
+        reg = <1>;
+        device_type = "ethernet-phy";
+    };
+};
+

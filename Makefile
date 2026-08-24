@@ -7,6 +7,11 @@
 ##
 ############################################
 
+##############
+## Variable ##
+##############
+WORK_DIR ?= WORK
+
 ##################
 ## Vivado build ##
 ##################
@@ -22,7 +27,7 @@ VIVADO_PARAMS ?=
 VIVADO_GUI ?= 0
 
 # Vivado working directory
-VIVADO_DIR ?= Vivado
+VIVADO_DIR ?= $(WORK_DIR)/Vivado
 
 # Vivado script dir
 VIVADO_SCRIPT_DIR ?= scripts/Vivado
@@ -34,6 +39,7 @@ VIVADO_PROJ_NAME ?= Smart_Zynq_SP2_Base
 VIVADO_TOP_NAME ?= TopModule
 
 ### Derive variable ###
+VIVADO_AB_DIR = $(realpath $(VIVADO_DIR))
 VIVADO_SCRIPT_AB_DIR = $(realpath $(VIVADO_SCRIPT_DIR))
 
 ifneq "$(VIVADO_GUI)" "1"
@@ -79,3 +85,59 @@ vivado-export: $(VIVADO_DIR)/$(VIVADO_PROJ_NAME).xpr
 .PHONY: vivado-gui
 vivado-gui: $(VIVADO_DIR)/$(VIVADO_PROJ_NAME).xpr
 	cd $(VIVADO_DIR); $(VIVADO) $(VIVADO_PARAMS) -script $(VIVADO_SCRIPT_AB_DIR)/start_gui.tcl $(VIVADO_PROJ_NAME).xpr
+
+#####################
+## Petalinux build ##
+#####################
+
+### Variable ###
+# Petalinux project name
+PETALINUX_PROJ_NAME ?= Petalinux
+
+# Petalinux template
+PETALINUX_TEMPLATE_NAME ?= zynq
+
+# Petalinux working directory
+PETALINUX_DIR ?= $(WORK_DIR)/$(PETALINUX_PROJ_NAME)
+
+### Derive variable ###
+PETALINUX_AB_DIR = $(realpath $(PETALINUX_DIR))
+
+### Target ###
+## Real target
+$(PETALINUX_DIR):
+	cd $(WORK_DIR); petalinux-create project --template $(PETALINUX_TEMPLATE_NAME) --name $(PETALINUX_PROJ_NAME)
+# FIXME: cannot use PETALINUX_AB_DIR
+	cd petalinux; find . -type f | grep -v CVS | cpio -pduv $(PWD)/$(WORK_DIR)/$(PETALINUX_PROJ_NAME)
+
+## Virtual target
+# Init project
+.PHONY: _petalinux_trigger_reinit petalinux-init
+_petalinux_trigger_reinit:
+# TODO: backup when reinit project
+	rm -rf $(PETALINUX_DIR)
+
+petalinux-init: _petalinux_trigger_reinit $(PETALINUX_DIR)
+
+# Config
+.PHONY: petalinux-config-hardware
+petalinux-config-hardware: $(VIVADO_DIR)/$(VIVADO_PROJ_NAME).xsa | $(PETALINUX_DIR)
+	cd $(PETALINUX_DIR); petalinux-config --get-hw-description=$(VIVADO_AB_DIR)/$(VIVADO_PROJ_NAME).xsa
+
+.PHONY: petalinux-config-uboot
+petalinux-config-uboot: | $(PETALINUX_DIR)
+	cd $(PETALINUX_DIR); petalinux-config -c uboot
+
+.PHONY: petalinux-config-kernel
+petalinux-config-kernel: | $(PETALINUX_DIR)
+	cd $(PETALINUX_DIR); petalinux-config -c kernel
+
+.PHONY: petalinux-config-rootfs
+petalinux-config-rootfs: | $(PETALINUX_DIR)
+	cd $(PETALINUX_DIR); petalinux-config -c rootfs
+
+# Build
+.PHONY: petalinux-build
+petalinux-build: | $(PETALINUX_DIR)
+	cd $(PETALINUX_DIR); petalinux-build
+	cd $(PETALINUX_DIR); petalinux-package boot --fsbl ./images/linux/zynq_fsbl.elf --u-boot --fpga --force
