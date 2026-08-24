@@ -3,7 +3,7 @@
 //--------------------------------------------------------------------------------
 //Tool Version: Vivado v.2025.2 (lin64) Build 6299465 Fri Nov 14 12:34:56 MST 2025
 //Date        : Sun May 17 23:03:06 2026
-//Host        : localhost.localdomain running 64-bit AlmaLinux 9.7 (Moss Jungle Cat)
+//Host        : sp.core running 64-bit AlmaLinux 9.7 (Moss Jungle Cat)
 //Command     : generate_target ZYNQ_CORE_wrapper.bd
 //Design      : ZYNQ_CORE_wrapper
 //Purpose     : IP block netlist

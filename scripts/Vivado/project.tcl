@@ -13,7 +13,7 @@
 proc checkRequiredFiles { origin_dir} {
   set status true
   set files [list \
- "[file normalize "$origin_dir/sources/ZYNQ_CORE_wrapper.v"]"\
+ "[file normalize "$origin_dir/bd/ZYNQ_CORE_wrapper.v"]"\
  "[file normalize "$origin_dir/sources/TopModule.v"]"\
  "[file normalize "$origin_dir/constrs/Top.xdc"]"\
   ]
@@ -161,7 +161,7 @@ if { $obj != {} } {
 set obj [get_filesets sources_1]
 # Import local files from the original project
 set files [list \
- [file normalize "${origin_dir}/sources/ZYNQ_CORE_wrapper.v"]\
+ [file normalize "${origin_dir}/bd/ZYNQ_CORE_wrapper.v"]\
  [file normalize "${origin_dir}/sources/TopModule.v" ]\
 ]
 set imported_files ""
