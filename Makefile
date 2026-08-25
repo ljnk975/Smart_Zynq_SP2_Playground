@@ -108,7 +108,8 @@ PETALINUX_AB_DIR = $(realpath $(PETALINUX_DIR))
 $(PETALINUX_DIR):
 	cd $(WORK_DIR); petalinux-create project --template $(PETALINUX_TEMPLATE_NAME) --name $(PETALINUX_PROJ_NAME)
 # FIXME: cannot use PETALINUX_AB_DIR
-	cd petalinux; find . -type f | grep -v CVS | cpio -pduv $(PWD)/$(WORK_DIR)/$(PETALINUX_PROJ_NAME)
+	cd petalinux; find . -type f | cpio -pduv $(PWD)/$(WORK_DIR)/$(PETALINUX_PROJ_NAME)
+	cd petalinux; find . -type f -exec sed -i 's%\$${FPGA_PROJECT_ROOT}%$(PWD)%g' $(PWD)/$(WORK_DIR)/$(PETALINUX_PROJ_NAME)/{} \;
 
 ## Virtual target
 # Init project

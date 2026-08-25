@@ -1,0 +1,6 @@
+[submodule "software/u-boot-xlnx"]
+	path = software/u-boot-xlnx
+	url = git@rocks.core:fpga/xilinx/software/u-boot-xlnx.git
+[submodule "software/linux-xlnx"]
+	path = software/linux-xlnx
+	url = git@rocks.core:fpga/xilinx/software/linux-xlnx.git
