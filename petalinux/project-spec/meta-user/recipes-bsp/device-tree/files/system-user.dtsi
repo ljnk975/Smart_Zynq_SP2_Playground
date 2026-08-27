@@ -52,21 +52,17 @@
 
 &spi0 {
     st7789v@0 {
-        compatible = "sitronix,st7789v";
+        compatible = "jhongjingyuan,zjy133t-if05";
         reg = <0>;
         spi-max-frequency = <32000000>;
+        // rotation = <180>;
 
         // Required GPIOs
-        dc-gpios = <&gpio0 54 1>;
-        reset-gpios = <&gpio0 55 1>;
+        dc-gpios = <&gpio0 54 0>;
+        reset-gpios = <&gpio0 55 0>;
 
         // Optional Properties
         backlight = <&backlight0>;
-
-        // Panels usually need rotation and size configuration
-        // rotation = <270>;
-        width = <240>;
-        height = <240>;
     };
 };
 
@@ -80,4 +76,3 @@
         device_type = "ethernet-phy";
     };
 };
-
