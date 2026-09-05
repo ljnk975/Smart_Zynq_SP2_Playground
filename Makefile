@@ -107,6 +107,11 @@ PETALINUX_AB_DIR = $(realpath $(PETALINUX_DIR))
 ## Real target
 $(PETALINUX_DIR):
 	cd $(WORK_DIR); petalinux-create project --template $(PETALINUX_TEMPLATE_NAME) --name $(PETALINUX_PROJ_NAME)
+
+$(PETALINUX_DIR)/.trigger_update: | $(PETALINUX_DIR)
+	touch $@
+
+$(PETALINUX_DIR)/.updated: $(PETALINUX_DIR)/.trigger_update
 # FIXME: cannot use PETALINUX_AB_DIR
 	cd petalinux; find . -type f | cpio -pduv $(PWD)/$(WORK_DIR)/$(PETALINUX_PROJ_NAME)
 	cd petalinux; find . -type f -exec sed -i 's%\$${FPGA_PROJECT_ROOT}%$(PWD)%g' $(PWD)/$(WORK_DIR)/$(PETALINUX_PROJ_NAME)/{} \;
@@ -118,7 +123,15 @@ _petalinux_trigger_reinit:
 # TODO: backup when reinit project
 	rm -rf $(PETALINUX_DIR)
 
-petalinux-init: _petalinux_trigger_reinit $(PETALINUX_DIR)
+petalinux-init: _petalinux_trigger_reinit petalinux-update
+
+# Update project
+.PHONY: _petalinux_trigger_update petalinux-update
+_petalinux_trigger_update:
+	touch $(PETALINUX_DIR)/.trigger_update
+
+.PHONY: petalinux-update
+petalinux-update: _petalinux_trigger_update $(PETALINUX_DIR)/.updated
 
 # Config
 .PHONY: petalinux-config-hardware
