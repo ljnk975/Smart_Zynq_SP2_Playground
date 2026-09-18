@@ -127,7 +127,7 @@ petalinux-init: _petalinux_trigger_reinit petalinux-update
 
 # Update project
 .PHONY: _petalinux_trigger_update petalinux-update
-_petalinux_trigger_update:
+_petalinux_trigger_update: | $(PETALINUX_DIR)
 	touch $(PETALINUX_DIR)/.trigger_update
 
 .PHONY: petalinux-update
