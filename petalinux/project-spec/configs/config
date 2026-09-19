@@ -150,5 +150,5 @@ CONFIG_SUBSYSTEM_DT_XSCT_WORKSPACE="${PROOT}/components/plnx_workspace/device-tr
 # PetaLinux Images Deploy Directory
 CONFIG_PLNX_IMAGES_LOCATION="${PROOT}/images/linux"
 CONFIG_TMP_DIR_LOCATION="${PROOT}/build/tmp"
-CONFIG_PRE_MIRROR_URL="file:///mnt/data/Repositories/Petalinux/2025.2/downloads"
-CONFIG_YOCTO_NETWORK_SSTATE_FEEDS_URL="file:///mnt/data/Repositories/Petalinux/2025.2/sstate"
+CONFIG_PRE_MIRROR_URL="file:///data/Repositories/Petalinux/2025.2/downloads"
+CONFIG_YOCTO_NETWORK_SSTATE_FEEDS_URL="file:///data/Repositories/Petalinux/2025.2/sstate"
