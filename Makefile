@@ -124,6 +124,7 @@ _petalinux_trigger_reinit:
 	rm -rf $(PETALINUX_DIR)
 
 petalinux-init: _petalinux_trigger_reinit petalinux-update
+	sed -i "s/\(target.append(get_attr(dir)\)/if len(os.listdir(os.path.join(rootpath, dir))) == 0: \1/" $(PETALINUX_DIR)/components/yocto/layers/poky/meta/classes-global/package_rpm.bbclass
 
 # Update project
 .PHONY: _petalinux_trigger_update petalinux-update

@@ -1,0 +1,19 @@
+From e2c8e6de4e604367c3ed5bd5debcc3d7a5d310e5 Mon Sep 17 00:00:00 2001
+From: Van Linh <Linhnv579@sp.core>
+Date: Wed, 14 Oct 2026 13:48:25 +0700
+Subject: [PATCH] Fix almalinux10 gcc build fail
+
+---
+ lms-hash-sigs/hss_param.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/lms-hash-sigs/hss_param.c b/lms-hash-sigs/hss_param.c
+index 7a2abd6..c1f14fc 100755
+--- a/lms-hash-sigs/hss_param.c
++++ b/lms-hash-sigs/hss_param.c
+@@ -1,4 +1,5 @@
+ #include <string.h>
++#include <stdio.h>
+ #include "hss.h"
+ #include "hss_internal.h"
+ #include "endian.h"
