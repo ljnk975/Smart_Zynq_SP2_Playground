@@ -38,6 +38,9 @@ VIVADO_PROJ_NAME ?= Smart_Zynq_SP2_Base
 # Vivado top file
 VIVADO_TOP_NAME ?= TopModule
 
+# Vivado hw server
+VIVADO_HW_SERVER ?= localhost:3121
+
 ### Derive variable ###
 VIVADO_AB_DIR = $(realpath $(VIVADO_DIR))
 VIVADO_SCRIPT_AB_DIR = $(realpath $(VIVADO_SCRIPT_DIR))
@@ -85,6 +88,11 @@ vivado-export: $(VIVADO_DIR)/$(VIVADO_PROJ_NAME).xpr
 .PHONY: vivado-gui
 vivado-gui: $(VIVADO_DIR)/$(VIVADO_PROJ_NAME).xpr
 	cd $(VIVADO_DIR); $(VIVADO) $(VIVADO_PARAMS) -script $(VIVADO_SCRIPT_AB_DIR)/start_gui.tcl $(VIVADO_PROJ_NAME).xpr
+
+# Open hw server
+.PHONY: vivado-hw_server
+vivado-hw_server: $(VIVADO_DIR)/$(VIVADO_PROJ_NAME).xpr
+	cd $(VIVADO_DIR); hw_server -s"TCP:$(VIVADO_HW_SERVER)"
 
 #####################
 ## Petalinux build ##
@@ -167,3 +175,9 @@ petalinux-clean-rootfs: | $(PETALINUX_DIR)
 petalinux-build: | $(PETALINUX_DIR)
 	cd $(PETALINUX_DIR); petalinux-build
 	cd $(PETALINUX_DIR); petalinux-package boot --fsbl ./images/linux/zynq_fsbl.elf --u-boot --fpga --force
+	cd $(PETALINUX_DIR); petalinux-package prebuilt --force
+
+# Run
+.PHONY: petalinux-run
+petalinux-run: | $(PETALINUX_DIR)
+	cd $(PETALINUX_DIR); petalinux-boot jtag --prebuilt 3 --hw_server-url "TCP:$(VIVADO_HW_SERVER)"
