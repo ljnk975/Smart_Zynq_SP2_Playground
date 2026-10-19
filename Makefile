@@ -134,10 +134,14 @@ _petalinux_trigger_update: | $(PETALINUX_DIR)
 .PHONY: petalinux-update
 petalinux-update: _petalinux_trigger_update $(PETALINUX_DIR)/.updated
 
+.PHONY: petalinux-update-hardware
+petalinux-update-hardware: $(VIVADO_DIR)/$(VIVADO_PROJ_NAME).xsa | $(PETALINUX_DIR)
+	cd $(PETALINUX_DIR); petalinux-config --get-hw-description=$(VIVADO_AB_DIR)/$(VIVADO_PROJ_NAME).xsa --silentconfig
+
 # Config
-.PHONY: petalinux-config-hardware
-petalinux-config-hardware: $(VIVADO_DIR)/$(VIVADO_PROJ_NAME).xsa | $(PETALINUX_DIR)
-	cd $(PETALINUX_DIR); petalinux-config --get-hw-description=$(VIVADO_AB_DIR)/$(VIVADO_PROJ_NAME).xsa
+.PHONY: petalinux-config
+petalinux-config: | $(PETALINUX_DIR)
+	cd $(PETALINUX_DIR); petalinux-config
 
 .PHONY: petalinux-config-uboot
 petalinux-config-uboot: | $(PETALINUX_DIR)
@@ -150,6 +154,13 @@ petalinux-config-kernel: | $(PETALINUX_DIR)
 .PHONY: petalinux-config-rootfs
 petalinux-config-rootfs: | $(PETALINUX_DIR)
 	cd $(PETALINUX_DIR); petalinux-config -c rootfs
+
+# Clean
+petalinux-clean-kernel: | $(PETALINUX_DIR)
+	cd $(PETALINUX_DIR); petalinux-build -c kernel -x cleansstate
+
+petalinux-clean-rootfs: | $(PETALINUX_DIR)
+	cd $(PETALINUX_DIR); petalinux-build -c rootfs -x cleansstate
 
 # Build
 .PHONY: petalinux-build
