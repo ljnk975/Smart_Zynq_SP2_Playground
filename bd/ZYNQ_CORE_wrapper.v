@@ -1,3 +1,32 @@
+// @Copyright@
+// 
+// Copyright (c) 2026, Van Linh (Ljnk975@gmail.com)
+// 
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+// 
+// 1. Redistributions of source code must retain the above copyright notice, this
+//    list of conditions and the following disclaimer.
+// 
+// 2. Redistributions in binary form must reproduce the above copyright notice,
+//    this list of conditions and the following disclaimer in the documentation
+//    and/or other materials provided with the distribution.
+// 
+// 3. Neither the name of the copyright holder nor the names of its
+//    contributors may be used to endorse or promote products derived from
+//    this software without specific prior written permission.
+// 
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
 //Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
 //Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 //--------------------------------------------------------------------------------
@@ -8,6 +37,7 @@
 //Design      : ZYNQ_CORE_wrapper
 //Purpose     : IP block netlist
 //--------------------------------------------------------------------------------
+
 `timescale 1 ps / 1 ps
 
 module ZYNQ_CORE_wrapper
@@ -152,6 +182,10 @@ module ZYNQ_CORE_wrapper
   wire SPI_0_io0_io;
   wire SPI_0_io0_o;
   wire SPI_0_io0_t;
+  wire SPI_0_io1_i;
+  wire SPI_0_io1_io;
+  wire SPI_0_io1_o;
+  wire SPI_0_io1_t;
   wire SPI_0_sck_i;
   wire SPI_0_sck_io;
   wire SPI_0_sck_o;
@@ -162,12 +196,6 @@ module ZYNQ_CORE_wrapper
   wire SPI_0_ss_io;
   wire SPI_0_ss_o;
   wire SPI_0_ss_t;
-  wire TMDS_0_clk_n;
-  wire TMDS_0_clk_p;
-  wire [2:0]TMDS_0_data_n;
-  wire [2:0]TMDS_0_data_p;
-  wire TMDS_Clk_b_n_0;
-  wire TMDS_Clk_b_p_0;
   wire UART_0_rxd;
   wire UART_0_txd;
 

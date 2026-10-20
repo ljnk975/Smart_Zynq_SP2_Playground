@@ -172,3 +172,7 @@ Rebuild:
 ```
 make petalinux-build
 ```
+
+# Licence and copyright
+
+BSD 3-Clause. Copyright (c) 2026, Van Linh (Ljnk975@gmail.com). See [LICENSE](LICENSE).
