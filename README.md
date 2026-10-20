@@ -17,6 +17,7 @@ This project contains full flow to building hardware and software from Vivado to
 - scripts: Script files
 - software: Uboot/Linux source code
 - sources: Vivado RTL files
+- third_party: External RTL and IP
 - WORK: Vivado/Petalinux working folder
 
 ## Main flow

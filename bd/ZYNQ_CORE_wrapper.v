@@ -78,6 +78,12 @@ module ZYNQ_CORE_wrapper
     SPI_0_ss1_o,
     SPI_0_ss2_o,
     SPI_0_ss_io,
+    IIC_0_scl_io,
+    IIC_0_sda_io,
+    TMDS_0_clk_n,
+    TMDS_0_clk_p,
+    TMDS_0_data_n,
+    TMDS_0_data_p,
     UART_0_rxd,
     UART_0_txd);
 
@@ -118,6 +124,12 @@ module ZYNQ_CORE_wrapper
   output SPI_0_ss1_o;
   output SPI_0_ss2_o;
   inout SPI_0_ss_io;
+  inout IIC_0_scl_io;
+  inout IIC_0_sda_io;
+  output TMDS_0_clk_n;
+  output TMDS_0_clk_p;
+  output [2:0]TMDS_0_data_n;
+  output [2:0]TMDS_0_data_p;
   input UART_0_rxd;
   output UART_0_txd;
 
@@ -196,6 +208,18 @@ module ZYNQ_CORE_wrapper
   wire SPI_0_ss_io;
   wire SPI_0_ss_o;
   wire SPI_0_ss_t;
+  wire IIC_0_scl_i;
+  wire IIC_0_scl_io;
+  wire IIC_0_scl_o;
+  wire IIC_0_scl_t;
+  wire IIC_0_sda_i;
+  wire IIC_0_sda_io;
+  wire IIC_0_sda_o;
+  wire IIC_0_sda_t;
+  wire TMDS_0_clk_n;
+  wire TMDS_0_clk_p;
+  wire [2:0]TMDS_0_data_n;
+  wire [2:0]TMDS_0_data_p;
   wire UART_0_rxd;
   wire UART_0_txd;
 
@@ -249,6 +273,16 @@ module ZYNQ_CORE_wrapper
         .IO(SPI_0_ss_io),
         .O(SPI_0_ss_i),
         .T(SPI_0_ss_t));
+  IOBUF IIC_0_scl_iobuf
+       (.I(IIC_0_scl_o),
+        .IO(IIC_0_scl_io),
+        .O(IIC_0_scl_i),
+        .T(IIC_0_scl_t));
+  IOBUF IIC_0_sda_iobuf
+       (.I(IIC_0_sda_o),
+        .IO(IIC_0_sda_io),
+        .O(IIC_0_sda_i),
+        .T(IIC_0_sda_t));
   ZYNQ_CORE ZYNQ_CORE_i
        (.DDR_addr(DDR_addr),
         .DDR_ba(DDR_ba),
@@ -299,6 +333,16 @@ module ZYNQ_CORE_wrapper
         .SPI_0_ss_i(SPI_0_ss_i),
         .SPI_0_ss_o(SPI_0_ss_o),
         .SPI_0_ss_t(SPI_0_ss_t),
+        .IIC_0_scl_i(IIC_0_scl_i),
+        .IIC_0_scl_o(IIC_0_scl_o),
+        .IIC_0_scl_t(IIC_0_scl_t),
+        .IIC_0_sda_i(IIC_0_sda_i),
+        .IIC_0_sda_o(IIC_0_sda_o),
+        .IIC_0_sda_t(IIC_0_sda_t),
+        .TMDS_0_clk_n(TMDS_0_clk_n),
+        .TMDS_0_clk_p(TMDS_0_clk_p),
+        .TMDS_0_data_n(TMDS_0_data_n),
+        .TMDS_0_data_p(TMDS_0_data_p),
         .UART_0_rxd(UART_0_rxd),
         .UART_0_txd(UART_0_txd));
 

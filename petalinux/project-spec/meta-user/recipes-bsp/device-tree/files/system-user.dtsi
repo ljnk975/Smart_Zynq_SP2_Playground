@@ -73,6 +73,60 @@
         };
     };
 
+    v_hdmi_tx@42040000 {
+        compatible = "xlnx,v-hdmi-tx-min-1.0";
+        reg = <0x42040000 0x10000>;
+        clock-names = "pixel_clk";
+        clocks = <&HDMI_SUB_clk_wiz_0 0>;
+        reset-gpios = <&HDMI_SUB_axi_gpio_0 1 1>;
+        ddc-i2c-bus = <&HDMI_SUB_axi_iic_0>;
+
+        ports {
+            #address-cells = <1>;
+            #size-cells = <0>;
+
+            port@0 {
+                reg = <0>;
+                hdmi_encoder: endpoint {
+                    remote-endpoint = <&dmaengine_crtc>;
+                };
+            };
+        };
+    };
+
+    /*
+    hdmi_connector: connector {
+        compatible = "hdmi-connector";
+        type = "a";
+
+        ddc-i2c-bus = <&HDMI_SUB_axi_iic_0>;
+
+        port {
+            hdmi_encoder: endpoint {
+                remote-endpoint = <&dmaengine_crtc>;
+            };
+        };
+    };
+    */
+
+    drm-pl-disp-drv {
+        compatible = "xlnx,pl-disp";
+        dmas = <&HDMI_SUB_v_frmbuf_rd_0 0>;
+        dma-names = "dma0";
+        xlnx,vformat = "RG24";
+        // xlnx,bridge = <&HDMI_SUB_v_tc_0>;
+        ports {
+            #address-cells = <1>;
+            #size-cells = <0>;
+
+            port@0 {
+                reg = <0>;
+                dmaengine_crtc: endpoint {
+                    remote-endpoint = <&hdmi_encoder>;
+                };
+            };
+        };
+    };
 };
 
 &usb0 {
@@ -105,4 +159,16 @@
         reg = <1>;
         device_type = "ethernet-phy";
     };
+};
+
+&HDMI_SUB_axi_iic_0 {
+    clock-frequency = <100000>;
+};
+
+&HDMI_SUB_v_frmbuf_rd_0 {
+    reset-gpios = <&HDMI_SUB_axi_gpio_0 0 1>;
+};
+
+&HDMI_SUB_v_tc_0 {
+    status = "disable";
 };

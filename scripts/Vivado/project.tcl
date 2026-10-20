@@ -54,6 +54,7 @@ proc checkRequiredFiles { origin_dir} {
   }
 
   set paths [list \
+  "[file normalize "$origin_dir/WORK/third_party"]"\
   "[file normalize "/data/Repositories/IP/FPGA"]" \
   "[file normalize "/mnt/data/Repositories/IP/FPGA"]" \
   ]
@@ -145,7 +146,7 @@ if { $validate_required } {
 }
 
 # Create project
-create_project ${_xil_proj_name_} . -part xc7z020clg484-2
+create_project ${_xil_proj_name_} -part xc7z020clg484-2
 
 # Set the directory path for the new project
 set proj_dir [get_property directory [current_project]]
@@ -168,6 +169,7 @@ set_property -name "sim.ip.auto_export_scripts" -value "1" -objects $obj
 set_property -name "simulator_language" -value "Mixed" -objects $obj
 set_property -name "sim_compile_state" -value "1" -objects $obj
 set_property -name "use_inline_hdl_ip" -value "1" -objects $obj
+set_property -name "xpm_libraries" -value "XPM_CDC XPM_FIFO XPM_MEMORY" -objects $obj
 
 # Create 'sources_1' fileset (if not found)
 if {[string equal [get_filesets -quiet sources_1] ""]} {
@@ -178,6 +180,7 @@ if {[string equal [get_filesets -quiet sources_1] ""]} {
 set obj [get_filesets sources_1]
 if { $obj != {} } {
    set_property "ip_repo_paths" "\
+     [file normalize "${origin_dir}/third_party"] \
      [file normalize "/data/Repositories/IP/FPGA"] \
      [file normalize "/mnt/data/Repositories/IP/FPGA"] \
    " $obj
@@ -193,9 +196,9 @@ set files [list \
  [file normalize "${origin_dir}/bd/ZYNQ_CORE_wrapper.v"]\
  [file normalize "${origin_dir}/sources/TopModule.v" ]\
 ]
-set imported_files ""
+set added_files ""
 foreach f $files {
-  lappend imported_files [add_files -norecurse -fileset sources_1 $f]
+  lappend added_files [add_files -norecurse -fileset sources_1 $f]
 }
 
 # Set 'sources_1' fileset file properties for remote files
@@ -208,6 +211,7 @@ foreach f $files {
 set obj [get_filesets sources_1]
 set_property -name "dataflow_viewer_settings" -value "min_width=16" -objects $obj
 set_property -name "top" -value "TopModule" -objects $obj
+set_property -name "top_auto_set" -value "0" -objects $obj
 
 # Create 'constrs_1' fileset (if not found)
 if {[string equal [get_filesets -quiet constrs_1] ""]} {
@@ -219,7 +223,7 @@ set obj [get_filesets constrs_1]
 
 # Add/Import constrs file and set constrs file properties
 set file "[file normalize "$origin_dir/constrs/Top.xdc"]"
-set file_imported [add_files -norecurse -fileset constrs_1 [list $file]]
+set file_added [add_files -norecurse -fileset constrs_1 [list $file]]
 set file_obj [get_files -of_objects [get_filesets constrs_1] [list "*$file"]]
 set_property -name "file_type" -value "XDC" -objects $file_obj
 
@@ -242,6 +246,7 @@ set obj [get_filesets sim_1]
 set obj [get_filesets sim_1]
 set_property -name "sim_wrapper_top" -value "1" -objects $obj
 set_property -name "top" -value "TopModule" -objects $obj
+set_property -name "top_auto_set" -value "0" -objects $obj
 set_property -name "top_lib" -value "xil_defaultlib" -objects $obj
 
 # Set 'utils_1' fileset object
@@ -285,6 +290,7 @@ if { $obj != "" } {
 }
 set obj [get_runs synth_1]
 set_property -name "part" -value "xc7z020clg484-2" -objects $obj
+set_property -name "auto_incremental_checkpoint" -value "1" -objects $obj
 set_property -name "strategy" -value "Vivado Synthesis Defaults" -objects $obj
 
 # set the current synth run

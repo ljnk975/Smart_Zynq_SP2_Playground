@@ -154,6 +154,19 @@ if { $bCheckIPs == 1 } {
 xilinx.com:ip:processing_system7:*\
 xilinx.com:ip:gmii_to_rgmii:*\
 xilinx.com:inline_hdl:ilvector_logic:*\
+xilinx.com:inline_hdl:ilconcat:*\
+xilinx.com:inline_hdl:ilslice:*\
+xilinx.com:ip:axi_iic:*\
+xilinx.com:ip:xlconstant:*\
+xilinx.com:ip:proc_sys_reset:*\
+xilinx.com:ip:v_frmbuf_rd:*\
+xilinx.com:ip:axi_gpio:*\
+xilinx.com:ip:v_axi4s_vid_out:*\
+xilinx.com:ip:smartconnect:*\
+xilinx.com:ip:v_tc:*\
+xilinx.com:ip:clk_wiz:*\
+xilinx.com:ip:axi_protocol_converter:*\
+digilentinc.com:ip:rgb2dvi:*\
 "
 
    set list_ips_missing ""
@@ -182,6 +195,8 @@ if { $bCheckIPsPassed != 1 } {
 # DESIGN PROCs
 ##################################################################
 
+
+source "$origin_dir/bd/HDMI_SUB.tcl"
 
 
 # Procedure to create entire design; Provide argument to make
@@ -231,6 +246,10 @@ proc create_root_design { parentCell } {
 
   set GPIO_0 [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:gpio_rtl:1.0 GPIO_0 ]
 
+  set IIC_0 [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:iic_rtl:1.0 IIC_0 ]
+
+  set TMDS_0 [ create_bd_intf_port -mode Master -vlnv digilentinc.com:interface:tmds_rtl:1.0 TMDS_0 ]
+
 
   # Create ports
   set ENET0_EXT_INTIN [ create_bd_port -dir I -type intr ENET0_EXT_INTIN ]
@@ -246,15 +265,15 @@ proc create_root_design { parentCell } {
     CONFIG.PCW_ACT_ENET0_PERIPHERAL_FREQMHZ {125.000000} \
     CONFIG.PCW_ACT_ENET1_PERIPHERAL_FREQMHZ {125.000000} \
     CONFIG.PCW_ACT_FPGA0_PERIPHERAL_FREQMHZ {200.000000} \
-    CONFIG.PCW_ACT_FPGA1_PERIPHERAL_FREQMHZ {10.000000} \
-    CONFIG.PCW_ACT_FPGA2_PERIPHERAL_FREQMHZ {10.000000} \
+    CONFIG.PCW_ACT_FPGA1_PERIPHERAL_FREQMHZ {50.000000} \
+    CONFIG.PCW_ACT_FPGA2_PERIPHERAL_FREQMHZ {150.000000} \
     CONFIG.PCW_ACT_FPGA3_PERIPHERAL_FREQMHZ {10.000000} \
     CONFIG.PCW_ACT_I2C_PERIPHERAL_FREQMHZ {50} \
     CONFIG.PCW_ACT_PCAP_PERIPHERAL_FREQMHZ {200.000000} \
     CONFIG.PCW_ACT_QSPI_PERIPHERAL_FREQMHZ {200.000000} \
     CONFIG.PCW_ACT_SDIO_PERIPHERAL_FREQMHZ {100.000000} \
     CONFIG.PCW_ACT_SMC_PERIPHERAL_FREQMHZ {10.000000} \
-    CONFIG.PCW_ACT_SPI_PERIPHERAL_FREQMHZ {166.666672} \
+    CONFIG.PCW_ACT_SPI_PERIPHERAL_FREQMHZ {163.636368} \
     CONFIG.PCW_ACT_TPIU_PERIPHERAL_FREQMHZ {200.000000} \
     CONFIG.PCW_ACT_TTC0_CLK0_PERIPHERAL_FREQMHZ {111.111115} \
     CONFIG.PCW_ACT_TTC0_CLK1_PERIPHERAL_FREQMHZ {111.111115} \
@@ -276,8 +295,8 @@ proc create_root_design { parentCell } {
     CONFIG.PCW_CAN_PERIPHERAL_CLKSRC {IO PLL} \
     CONFIG.PCW_CAN_PERIPHERAL_VALID {0} \
     CONFIG.PCW_CLK0_FREQ {200000000} \
-    CONFIG.PCW_CLK1_FREQ {10000000} \
-    CONFIG.PCW_CLK2_FREQ {10000000} \
+    CONFIG.PCW_CLK1_FREQ {50000000} \
+    CONFIG.PCW_CLK2_FREQ {150000000} \
     CONFIG.PCW_CLK3_FREQ {10000000} \
     CONFIG.PCW_CPU_CPU_6X4X_MAX_RANGE {767} \
     CONFIG.PCW_CPU_PERIPHERAL_CLKSRC {ARM PLL} \
@@ -305,8 +324,8 @@ proc create_root_design { parentCell } {
     CONFIG.PCW_EN_CAN0 {0} \
     CONFIG.PCW_EN_CAN1 {0} \
     CONFIG.PCW_EN_CLK0_PORT {1} \
-    CONFIG.PCW_EN_CLK1_PORT {0} \
-    CONFIG.PCW_EN_CLK2_PORT {0} \
+    CONFIG.PCW_EN_CLK1_PORT {1} \
+    CONFIG.PCW_EN_CLK2_PORT {1} \
     CONFIG.PCW_EN_CLK3_PORT {0} \
     CONFIG.PCW_EN_CLKTRIG0_PORT {0} \
     CONFIG.PCW_EN_CLKTRIG1_PORT {0} \
@@ -371,11 +390,15 @@ proc create_root_design { parentCell } {
     CONFIG.PCW_FCLK2_PERIPHERAL_CLKSRC {IO PLL} \
     CONFIG.PCW_FCLK3_PERIPHERAL_CLKSRC {IO PLL} \
     CONFIG.PCW_FCLK_CLK0_BUF {TRUE} \
+    CONFIG.PCW_FCLK_CLK1_BUF {FALSE} \
+    CONFIG.PCW_FCLK_CLK2_BUF {FALSE} \
     CONFIG.PCW_FPGA0_PERIPHERAL_FREQMHZ {200} \
-    CONFIG.PCW_FPGA1_PERIPHERAL_FREQMHZ {150} \
-    CONFIG.PCW_FPGA2_PERIPHERAL_FREQMHZ {200} \
+    CONFIG.PCW_FPGA1_PERIPHERAL_FREQMHZ {50} \
+    CONFIG.PCW_FPGA2_PERIPHERAL_FREQMHZ {150} \
     CONFIG.PCW_FPGA3_PERIPHERAL_FREQMHZ {50} \
     CONFIG.PCW_FPGA_FCLK0_ENABLE {1} \
+    CONFIG.PCW_FPGA_FCLK1_ENABLE {1} \
+    CONFIG.PCW_FPGA_FCLK2_ENABLE {1} \
     CONFIG.PCW_GP0_EN_MODIFIABLE_TXN {1} \
     CONFIG.PCW_GP0_NUM_READ_THREADS {4} \
     CONFIG.PCW_GP0_NUM_WRITE_THREADS {4} \
@@ -396,6 +419,7 @@ proc create_root_design { parentCell } {
     CONFIG.PCW_I2C_RESET_POLARITY {Active Low} \
     CONFIG.PCW_IMPORT_BOARD_PRESET {None} \
     CONFIG.PCW_INCLUDE_ACP_TRANS_CHECK {0} \
+    CONFIG.PCW_IRQ_F2P_INTR {1} \
     CONFIG.PCW_MIO_0_IOTYPE {LVCMOS 3.3V} \
     CONFIG.PCW_MIO_0_PULLUP {enabled} \
     CONFIG.PCW_MIO_0_SLEW {slow} \
@@ -757,16 +781,16 @@ proc create_root_design { parentCell } {
     CONFIG.PCW_USE_DMA2 {0} \
     CONFIG.PCW_USE_DMA3 {0} \
     CONFIG.PCW_USE_EXPANDED_IOP {0} \
-    CONFIG.PCW_USE_FABRIC_INTERRUPT {0} \
+    CONFIG.PCW_USE_FABRIC_INTERRUPT {1} \
     CONFIG.PCW_USE_HIGH_OCM {0} \
-    CONFIG.PCW_USE_M_AXI_GP0 {0} \
+    CONFIG.PCW_USE_M_AXI_GP0 {1} \
     CONFIG.PCW_USE_M_AXI_GP1 {0} \
     CONFIG.PCW_USE_PROC_EVENT_BUS {0} \
     CONFIG.PCW_USE_PS_SLCR_REGISTERS {0} \
     CONFIG.PCW_USE_S_AXI_ACP {0} \
     CONFIG.PCW_USE_S_AXI_GP0 {0} \
     CONFIG.PCW_USE_S_AXI_GP1 {0} \
-    CONFIG.PCW_USE_S_AXI_HP0 {0} \
+    CONFIG.PCW_USE_S_AXI_HP0 {1} \
     CONFIG.PCW_USE_S_AXI_HP1 {0} \
     CONFIG.PCW_USE_S_AXI_HP2 {0} \
     CONFIG.PCW_USE_S_AXI_HP3 {0} \
@@ -792,7 +816,18 @@ proc create_root_design { parentCell } {
   ] $ilvector_logic_0
 
 
+  # Create instance: HDMI_SUB
+  create_hier_cell_HDMI_SUB [current_bd_instance .] HDMI_SUB
+
+  # Create instance: ilconcat_0, and set properties
+  set ilconcat_0 [ create_bd_cell -type inline_hdl -vlnv xilinx.com:inline_hdl:ilconcat ilconcat_0 ]
+  set_property CONFIG.NUM_PORTS {6} $ilconcat_0
+
+
   # Create interface connections
+  connect_bd_intf_net -intf_net HDMI_SUB_IIC_0 [get_bd_intf_ports IIC_0] [get_bd_intf_pins HDMI_SUB/IIC_0]
+  connect_bd_intf_net -intf_net HDMI_SUB_M00_AXI [get_bd_intf_pins processing_system7_0/S_AXI_HP0] [get_bd_intf_pins HDMI_SUB/M00_AXI]
+  connect_bd_intf_net -intf_net HDMI_SUB_TMDS_0 [get_bd_intf_ports TMDS_0] [get_bd_intf_pins HDMI_SUB/TMDS_0]
   connect_bd_intf_net -intf_net gmii_to_rgmii_0_MDIO_PHY [get_bd_intf_ports MDIO_PHY_0] [get_bd_intf_pins gmii_to_rgmii_0/MDIO_PHY]
   connect_bd_intf_net -intf_net gmii_to_rgmii_0_RGMII [get_bd_intf_ports RGMII_0] [get_bd_intf_pins gmii_to_rgmii_0/RGMII]
   connect_bd_intf_net -intf_net processing_system7_0_DDR [get_bd_intf_ports DDR] [get_bd_intf_pins processing_system7_0/DDR]
@@ -800,21 +835,49 @@ proc create_root_design { parentCell } {
   connect_bd_intf_net -intf_net processing_system7_0_GMII_ETHERNET_0 [get_bd_intf_pins processing_system7_0/GMII_ETHERNET_0] [get_bd_intf_pins gmii_to_rgmii_0/GMII]
   connect_bd_intf_net -intf_net processing_system7_0_GPIO_0 [get_bd_intf_ports GPIO_0] [get_bd_intf_pins processing_system7_0/GPIO_0]
   connect_bd_intf_net -intf_net processing_system7_0_MDIO_ETHERNET_0 [get_bd_intf_pins processing_system7_0/MDIO_ETHERNET_0] [get_bd_intf_pins gmii_to_rgmii_0/MDIO_GEM]
+  connect_bd_intf_net -intf_net processing_system7_0_M_AXI_GP0 [get_bd_intf_pins processing_system7_0/M_AXI_GP0] [get_bd_intf_pins HDMI_SUB/S00_AXI]
   connect_bd_intf_net -intf_net processing_system7_0_SPI_0 [get_bd_intf_ports SPI_0] [get_bd_intf_pins processing_system7_0/SPI_0]
   connect_bd_intf_net -intf_net processing_system7_0_UART_0 [get_bd_intf_ports UART_0] [get_bd_intf_pins processing_system7_0/UART_0]
 
   # Create port connections
   connect_bd_net -net ENET0_EXT_INTIN_0_1  [get_bd_ports ENET0_EXT_INTIN] \
   [get_bd_pins processing_system7_0/ENET0_EXT_INTIN]
+  connect_bd_net -net HDMI_SUB_dma_intr  [get_bd_pins HDMI_SUB/dma_intr] \
+  [get_bd_pins ilconcat_0/In1]
+  connect_bd_net -net HDMI_SUB_iic2_intr  [get_bd_pins HDMI_SUB/iic2_intr] \
+  [get_bd_pins ilconcat_0/In0]
+  connect_bd_net -net HDMI_SUB_lock_intr  [get_bd_pins HDMI_SUB/lock_intr] \
+  [get_bd_pins ilconcat_0/In3]
+  connect_bd_net -net HDMI_SUB_overflow_intr  [get_bd_pins HDMI_SUB/overflow_intr] \
+  [get_bd_pins ilconcat_0/In4]
+  connect_bd_net -net HDMI_SUB_underflow_intr  [get_bd_pins HDMI_SUB/underflow_intr] \
+  [get_bd_pins ilconcat_0/In5]
+  connect_bd_net -net HDMI_SUB_vtc_intr  [get_bd_pins HDMI_SUB/vtc_intr] \
+  [get_bd_pins ilconcat_0/In2]
+  connect_bd_net -net ilconcat_0_dout  [get_bd_pins ilconcat_0/dout] \
+  [get_bd_pins processing_system7_0/IRQ_F2P]
   connect_bd_net -net processing_system7_0_FCLK_CLK0  [get_bd_pins processing_system7_0/FCLK_CLK0] \
   [get_bd_pins gmii_to_rgmii_0/clkin]
+  connect_bd_net -net processing_system7_0_FCLK_CLK1  [get_bd_pins processing_system7_0/FCLK_CLK1] \
+  [get_bd_pins processing_system7_0/M_AXI_GP0_ACLK] \
+  [get_bd_pins HDMI_SUB/axi_clk]
+  connect_bd_net -net processing_system7_0_FCLK_CLK2  [get_bd_pins processing_system7_0/FCLK_CLK2] \
+  [get_bd_pins processing_system7_0/S_AXI_HP0_ACLK] \
+  [get_bd_pins HDMI_SUB/dma_clk]
   connect_bd_net -net processing_system7_0_FCLK_RESET0_N  [get_bd_pins processing_system7_0/FCLK_RESET0_N] \
+  [get_bd_pins HDMI_SUB/resetn] \
   [get_bd_pins ilvector_logic_0/Op1]
   connect_bd_net -net util_vector_logic_0_Res  [get_bd_pins ilvector_logic_0/Res] \
   [get_bd_pins gmii_to_rgmii_0/tx_reset] \
   [get_bd_pins gmii_to_rgmii_0/rx_reset]
 
   # Create address segments
+  assign_bd_address -offset 0x42010000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs HDMI_SUB/axi_gpio_0/S_AXI/Reg] -force
+  assign_bd_address -offset 0x42020000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs HDMI_SUB/axi_iic_0/S_AXI/Reg] -force
+  assign_bd_address -offset 0x42030000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs HDMI_SUB/clk_wiz_0/s_axi_lite/Reg] -force
+  assign_bd_address -offset 0x42000000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs HDMI_SUB/v_frmbuf_rd_0/s_axi_CTRL/Reg] -force
+  assign_bd_address -offset 0x42040000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs HDMI_SUB/v_tc_0/ctrl/Reg] -force
+  assign_bd_address -offset 0x00000000 -range 0x20000000 -target_address_space [get_bd_addr_spaces HDMI_SUB/v_frmbuf_rd_0/Data_m_axi_mm_video] [get_bd_addr_segs processing_system7_0/S_AXI_HP0/HP0_DDR_LOWOCM] -force
 
 
   # Restore current instance

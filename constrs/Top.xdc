@@ -41,6 +41,18 @@ set_property -dict {PACKAGE_PIN R15 IOSTANDARD LVCMOS33} [get_ports {GPIO_EMIO[0
 set_property -dict {PACKAGE_PIN L16 IOSTANDARD LVCMOS33} [get_ports {GPIO_EMIO[1]}]
 set_property -dict {PACKAGE_PIN T16 IOSTANDARD LVCMOS33} [get_ports {GPIO_EMIO[2]}]
 
+# HDMI
+#set_property -dict {PACKAGE_PIN L19 IOSTANDARD LVCMOS33} [get_ports HDMI_RX_HPD]
+
+set_property -dict {PACKAGE_PIN K20 IOSTANDARD LVCMOS33} [get_ports IIC_0_sda_io]
+set_property -dict {PACKAGE_PIN K19 IOSTANDARD LVCMOS33} [get_ports IIC_0_scl_io]
+
+set_property -dict {PACKAGE_PIN M21} [get_ports {TMDS_0_data_p[0]}]
+set_property -dict {PACKAGE_PIN L21} [get_ports {TMDS_0_data_p[1]}]
+set_property -dict {PACKAGE_PIN J21} [get_ports {TMDS_0_data_p[2]}]
+
+set_property -dict {PACKAGE_PIN N19} [get_ports TMDS_0_clk_p]
+
 # Ethernet
 set_property -dict {PACKAGE_PIN G21 IOSTANDARD LVCMOS33} [get_ports MDIO_PHY_mdc]
 set_property -dict {PACKAGE_PIN H22 IOSTANDARD LVCMOS33} [get_ports MDIO_PHY_mdio_io]

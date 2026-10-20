@@ -36,4 +36,8 @@ SRC_URI += "file://xilinx_gmii2xgmii.cfg \
             file://st7789.cfg \
             file://framebuffer.cfg \
             file://logo.cfg \
+            file://hdmitx_min.cfg \
+            file://xilinx_i2c.cfg \
+            file://xilinx_pl_disp.cfg \
+            file://xilinx_clkwzrd.cfg \
             "

@@ -4,3 +4,6 @@
 [submodule "software/linux-xlnx"]
 	path = software/linux-xlnx
 	url = git@rocks.core:fpga/xilinx/software/linux-xlnx.git
+[submodule "third_party/digilent"]
+	path = third_party/digilent
+	url = https://github.com/digilent/vivado-library

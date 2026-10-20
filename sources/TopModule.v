@@ -38,6 +38,13 @@ module TopModule(
     inout  SPI_0_ss_io,
     inout  SPI_0_io0_io,
 
+    inout  IIC_0_scl_io,
+    inout  IIC_0_sda_io,
+    output TMDS_0_clk_n,
+    output TMDS_0_clk_p,
+    output [2:0] TMDS_0_data_n,
+    output [2:0] TMDS_0_data_p,
+
     output MDIO_PHY_mdc,
     inout  MDIO_PHY_mdio_io,
     input  [3:0] RGMII_rd,
@@ -59,6 +66,14 @@ module TopModule(
     .SPI_0_sck_io(SPI_0_sck_io),
     .SPI_0_ss_io(SPI_0_ss_io),
     .SPI_0_io0_io(SPI_0_io0_io),
+
+    .IIC_0_scl_io(IIC_0_scl_io),
+    .IIC_0_sda_io(IIC_0_sda_io),
+
+    .TMDS_0_clk_n(TMDS_0_clk_n),
+    .TMDS_0_clk_p(TMDS_0_clk_p),
+    .TMDS_0_data_n(TMDS_0_data_n),
+    .TMDS_0_data_p(TMDS_0_data_p),
 
     .MDIO_PHY_0_mdc(MDIO_PHY_mdc),
     .MDIO_PHY_0_mdio_io(MDIO_PHY_mdio_io),
