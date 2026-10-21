@@ -30,5 +30,30 @@
 
 set proj_name [get_property NAME [current_project]]
 
-# TODO: write bd tcl, import bd tcl
-write_project_tcl -no_ip_version -force $proj_name.tcl
+# Set the reference directory for source file relative paths (by default the value is script directory path)
+set origin_dir "."
+
+# Use origin directory path location variable, if specified in the tcl shell
+if { [info exists ::origin_dir_loc] } {
+  set origin_dir $::origin_dir_loc
+}
+
+if { $::argc > 0 } {
+  for {set i 0} {$i < $::argc} {incr i} {
+    set option [string trim [lindex $::argv $i]]
+    switch -regexp -- $option {
+      "--origin_dir"   { incr i; set origin_dir [lindex $::argv $i] }
+      default {
+      }
+    }
+  }
+}
+
+foreach bd [get_files -filter {FILE_TYPE == "Block Designs"}] {
+  set basename [file rootname [file tail $bd]]
+  open_bd_design $bd
+  write_bd_tcl -no_ip_version -force $origin_dir/bd/$basename.tcl
+  close_bd_design $basename
+}
+
+write_project_tcl -paths_relative_to $origin_dir -target_proj_dir . -use_bd_files -force $origin_dir/scripts/Vivado/project.tcl
