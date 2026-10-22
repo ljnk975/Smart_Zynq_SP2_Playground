@@ -1,9 +1,9 @@
 [submodule "software/u-boot-xlnx"]
 	path = software/u-boot-xlnx
-	url = git@rocks.core:fpga/xilinx/software/u-boot-xlnx.git
+	url = https://github.com/ljnk975/u-boot-xlnx.git
 [submodule "software/linux-xlnx"]
 	path = software/linux-xlnx
-	url = git@rocks.core:fpga/xilinx/software/linux-xlnx.git
+	url = https://github.com/ljnk975/linux-xlnx.git
 [submodule "third_party/digilent"]
 	path = third_party/digilent
 	url = https://github.com/digilent/vivado-library
