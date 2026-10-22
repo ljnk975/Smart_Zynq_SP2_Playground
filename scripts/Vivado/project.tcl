@@ -55,8 +55,6 @@ proc checkRequiredFiles { origin_dir} {
 
   set paths [list \
   "[file normalize "$origin_dir/WORK/third_party"]"\
-  "[file normalize "/data/Repositories/IP/FPGA"]" \
-  "[file normalize "/mnt/data/Repositories/IP/FPGA"]" \
   ]
   foreach ipath $paths {
     if { ![file isdirectory $ipath] } {
@@ -181,8 +179,6 @@ set obj [get_filesets sources_1]
 if { $obj != {} } {
    set_property "ip_repo_paths" "\
      [file normalize "${origin_dir}/third_party"] \
-     [file normalize "/data/Repositories/IP/FPGA"] \
-     [file normalize "/mnt/data/Repositories/IP/FPGA"] \
    " $obj
 
    # Rebuild user ip_repo's index before adding any source files

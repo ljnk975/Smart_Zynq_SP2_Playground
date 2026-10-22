@@ -174,11 +174,10 @@ CONFIG_SUBSYSTEM_PRODUCT="Petalinux"
 CONFIG_SUBSYSTEM_FW_VERSION="1.00"
 CONFIG_SUBSYSTEM_MACHINE_NAME="template"
 CONFIG_SUBSYSTEM_DT_XSCT_WORKSPACE="${PROOT}/components/plnx_workspace/device-tree"
+
 #
 # Yocto Settings
 #
 # PetaLinux Images Deploy Directory
 CONFIG_PLNX_IMAGES_LOCATION="${PROOT}/images/linux"
 CONFIG_TMP_DIR_LOCATION="${PROOT}/build/tmp"
-CONFIG_PRE_MIRROR_URL="file:///data/Repositories/Petalinux/2025.2/downloads"
-CONFIG_YOCTO_NETWORK_SSTATE_FEEDS_URL="file:///data/Repositories/Petalinux/2025.2/sstate"
