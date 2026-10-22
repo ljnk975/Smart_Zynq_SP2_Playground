@@ -156,7 +156,7 @@ _petalinux_trigger_reinit:
 # TODO: backup when reinit project
 	rm -rf $(PETALINUX_DIR)
 
-petalinux-init: _petalinux_trigger_reinit petalinux-update
+petalinux-init: _petalinux_trigger_reinit petalinux-update petalinux-update-hardware
 	sed -i "s/\(target.append(get_attr(dir)\)/if len(os.listdir(os.path.join(rootpath, dir))) == 0: \1/" $(PETALINUX_DIR)/components/yocto/layers/poky/meta/classes-global/package_rpm.bbclass
 
 # Update project
