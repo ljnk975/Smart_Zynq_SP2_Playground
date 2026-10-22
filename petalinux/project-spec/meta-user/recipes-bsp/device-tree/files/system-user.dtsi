@@ -78,7 +78,7 @@
         reg = <0x42040000 0x10000>;
         clock-names = "pixel_clk";
         clocks = <&HDMI_SUB_clk_wiz_0 0>;
-        reset-gpios = <&HDMI_SUB_axi_gpio_0 1 1>;
+        reset-gpios = <&HDMI_SUB_axi_gpio_0 0 1>;
         ddc-i2c-bus = <&HDMI_SUB_axi_iic_0>;
 
         ports {
@@ -88,7 +88,7 @@
             port@0 {
                 reg = <0>;
                 hdmi_encoder: endpoint {
-                    remote-endpoint = <&dmaengine_crtc>;
+                    remote-endpoint = <&crtc_mixer_portHDMI_SUB_v_mix_0>;
                 };
             };
         };
@@ -107,7 +107,6 @@
             };
         };
     };
-    */
 
     drm-pl-disp-drv {
         compatible = "xlnx,pl-disp";
@@ -127,6 +126,7 @@
             };
         };
     };
+    */
 };
 
 &usb0 {
@@ -166,9 +166,23 @@
 };
 
 &HDMI_SUB_v_frmbuf_rd_0 {
-    reset-gpios = <&HDMI_SUB_axi_gpio_0 0 1>;
+    reset-gpios = <&HDMI_SUB_axi_gpio_0 1 1>;
 };
 
 &HDMI_SUB_v_tc_0 {
     status = "disable";
+};
+
+&HDMI_SUB_v_mix_0 {
+    reset-gpios = <&HDMI_SUB_axi_gpio_0 2 1>;
+    xlnx,ppc = <3>;
+    xlnx,video-format = <0>;
+};
+
+&xx_mix_masterHDMI_SUB_v_mix_0 {
+    xlnx,vformat = "RG24";
+};
+
+&mixer_crtcHDMI_SUB_v_mix_0 {
+    remote-endpoint = <&hdmi_encoder>;
 };

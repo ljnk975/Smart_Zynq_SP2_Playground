@@ -1,33 +1,4 @@
 
-# @Copyright@
-# 
-# Copyright (c) 2026, Van Linh (Ljnk975@gmail.com)
-# 
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-# 
-# 1. Redistributions of source code must retain the above copyright notice, this
-#    list of conditions and the following disclaimer.
-# 
-# 2. Redistributions in binary form must reproduce the above copyright notice,
-#    this list of conditions and the following disclaimer in the documentation
-#    and/or other materials provided with the distribution.
-# 
-# 3. Neither the name of the copyright holder nor the names of its
-#    contributors may be used to endorse or promote products derived from
-#    this software without specific prior written permission.
-# 
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#
 ################################################################
 # This is a generated script based on design: ZYNQ_CORE
 #
@@ -166,6 +137,7 @@ xilinx.com:ip:smartconnect:*\
 xilinx.com:ip:v_tc:*\
 xilinx.com:ip:clk_wiz:*\
 xilinx.com:ip:axi_protocol_converter:*\
+xilinx.com:ip:v_mix:*\
 digilentinc.com:ip:rgb2dvi:*\
 "
 
@@ -821,7 +793,7 @@ proc create_root_design { parentCell } {
 
   # Create instance: ilconcat_0, and set properties
   set ilconcat_0 [ create_bd_cell -type inline_hdl -vlnv xilinx.com:inline_hdl:ilconcat ilconcat_0 ]
-  set_property CONFIG.NUM_PORTS {6} $ilconcat_0
+  set_property CONFIG.NUM_PORTS {7} $ilconcat_0
 
 
   # Create interface connections
@@ -852,6 +824,8 @@ proc create_root_design { parentCell } {
   [get_bd_pins ilconcat_0/In4]
   connect_bd_net -net HDMI_SUB_underflow_intr  [get_bd_pins HDMI_SUB/underflow_intr] \
   [get_bd_pins ilconcat_0/In5]
+  connect_bd_net -net HDMI_SUB_vmix_intr  [get_bd_pins HDMI_SUB/vmix_intr] \
+  [get_bd_pins ilconcat_0/In6]
   connect_bd_net -net HDMI_SUB_vtc_intr  [get_bd_pins HDMI_SUB/vtc_intr] \
   [get_bd_pins ilconcat_0/In2]
   connect_bd_net -net ilconcat_0_dout  [get_bd_pins ilconcat_0/dout] \
@@ -876,8 +850,12 @@ proc create_root_design { parentCell } {
   assign_bd_address -offset 0x42020000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs HDMI_SUB/axi_iic_0/S_AXI/Reg] -force
   assign_bd_address -offset 0x42030000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs HDMI_SUB/clk_wiz_0/s_axi_lite/Reg] -force
   assign_bd_address -offset 0x42000000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs HDMI_SUB/v_frmbuf_rd_0/s_axi_CTRL/Reg] -force
+  assign_bd_address -offset 0x42050000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs HDMI_SUB/v_mix_0/s_axi_CTRL/Reg] -force
   assign_bd_address -offset 0x42040000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs HDMI_SUB/v_tc_0/ctrl/Reg] -force
   assign_bd_address -offset 0x00000000 -range 0x20000000 -target_address_space [get_bd_addr_spaces HDMI_SUB/v_frmbuf_rd_0/Data_m_axi_mm_video] [get_bd_addr_segs processing_system7_0/S_AXI_HP0/HP0_DDR_LOWOCM] -force
+  assign_bd_address -offset 0x00000000 -range 0x20000000 -target_address_space [get_bd_addr_spaces HDMI_SUB/v_mix_0/Data_m_axi_mm_video1] [get_bd_addr_segs processing_system7_0/S_AXI_HP0/HP0_DDR_LOWOCM] -force
+  assign_bd_address -offset 0x00000000 -range 0x20000000 -target_address_space [get_bd_addr_spaces HDMI_SUB/v_mix_0/Data_m_axi_mm_video2] [get_bd_addr_segs processing_system7_0/S_AXI_HP0/HP0_DDR_LOWOCM] -force
+  assign_bd_address -offset 0x00000000 -range 0x20000000 -target_address_space [get_bd_addr_spaces HDMI_SUB/v_mix_0/Data_m_axi_mm_video3] [get_bd_addr_segs processing_system7_0/S_AXI_HP0/HP0_DDR_LOWOCM] -force
 
 
   # Restore current instance

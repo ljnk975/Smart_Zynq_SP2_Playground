@@ -40,4 +40,5 @@ SRC_URI += "file://xilinx_gmii2xgmii.cfg \
             file://xilinx_i2c.cfg \
             file://xilinx_pl_disp.cfg \
             file://xilinx_clkwzrd.cfg \
+            file://xilinx_video_mixer.cfg \
             "

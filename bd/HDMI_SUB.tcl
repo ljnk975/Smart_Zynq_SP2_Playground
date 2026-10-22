@@ -78,6 +78,7 @@ proc create_hier_cell_HDMI_SUB { parentCell nameHier } {
   create_bd_pin -dir I -type rst resetn
   create_bd_pin -dir O -type intr iic2_intr
   create_bd_pin -dir O -type intr dma_intr
+  create_bd_pin -dir O -type intr vmix_intr
   create_bd_pin -dir O -type intr vtc_intr
   create_bd_pin -dir O -type intr lock_intr
   create_bd_pin -dir O -type intr overflow_intr
@@ -99,8 +100,12 @@ proc create_hier_cell_HDMI_SUB { parentCell nameHier } {
   # Create instance: v_frmbuf_rd_0, and set properties
   set v_frmbuf_rd_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:v_frmbuf_rd v_frmbuf_rd_0 ]
   set_property -dict [list \
+    CONFIG.HAS_ALPHA {0} \
     CONFIG.HAS_BGR8 {1} \
-    CONFIG.HAS_INTERLACED {1} \
+    CONFIG.HAS_BGRX8 {0} \
+    CONFIG.HAS_INTERLACED {0} \
+    CONFIG.HAS_RGB8 {0} \
+    CONFIG.HAS_RGBX8 {0} \
     CONFIG.SAMPLES_PER_CLOCK {1} \
   ] $v_frmbuf_rd_0
 
@@ -110,7 +115,7 @@ proc create_hier_cell_HDMI_SUB { parentCell nameHier } {
   set_property -dict [list \
     CONFIG.C_ALL_OUTPUTS {1} \
     CONFIG.C_DOUT_DEFAULT {0x00000000} \
-    CONFIG.C_GPIO_WIDTH {2} \
+    CONFIG.C_GPIO_WIDTH {3} \
   ] $axi_gpio_0
 
 
@@ -123,36 +128,40 @@ proc create_hier_cell_HDMI_SUB { parentCell nameHier } {
   ] $rgb2dvi_0
 
 
-  # Create instance: rst_ps7_0_100M, and set properties
-  set rst_ps7_0_100M [ create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset rst_ps7_0_100M ]
-  set_property CONFIG.C_AUX_RESET_HIGH {0} $rst_ps7_0_100M
+  # Create instance: rst_ps7_0_frmbuf, and set properties
+  set rst_ps7_0_frmbuf [ create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset rst_ps7_0_frmbuf ]
+  set_property CONFIG.C_AUX_RESET_HIGH {0} $rst_ps7_0_frmbuf
 
 
-  # Create instance: ilslice_0, and set properties
-  set ilslice_0 [ create_bd_cell -type inline_hdl -vlnv xilinx.com:inline_hdl:ilslice ilslice_0 ]
+  # Create instance: ilslice_1, and set properties
+  set ilslice_1 [ create_bd_cell -type inline_hdl -vlnv xilinx.com:inline_hdl:ilslice ilslice_1 ]
   set_property -dict [list \
-    CONFIG.DIN_FROM {0} \
-    CONFIG.DIN_TO {0} \
-    CONFIG.DIN_WIDTH {2} \
-  ] $ilslice_0
+    CONFIG.DIN_FROM {1} \
+    CONFIG.DIN_TO {1} \
+    CONFIG.DIN_WIDTH {3} \
+  ] $ilslice_1
 
 
   # Create instance: v_axi4s_vid_out_0, and set properties
   set v_axi4s_vid_out_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:v_axi4s_vid_out v_axi4s_vid_out_0 ]
-  set_property CONFIG.C_HAS_ASYNC_CLK {1} $v_axi4s_vid_out_0
+  set_property -dict [list \
+    CONFIG.C_HAS_ASYNC_CLK {1} \
+    CONFIG.C_S_AXIS_VIDEO_DATA_WIDTH {8} \
+    CONFIG.C_S_AXIS_VIDEO_FORMAT {2} \
+  ] $v_axi4s_vid_out_0
 
 
   # Create instance: ps7_0_axi_periph, and set properties
   set ps7_0_axi_periph [ create_bd_cell -type ip -vlnv xilinx.com:ip:smartconnect ps7_0_axi_periph ]
   set_property -dict [list \
     CONFIG.NUM_CLKS {2} \
-    CONFIG.NUM_MI {5} \
+    CONFIG.NUM_MI {6} \
     CONFIG.NUM_SI {1} \
   ] $ps7_0_axi_periph
 
 
-  # Create instance: rst_ps7_0_50M, and set properties
-  set rst_ps7_0_50M [ create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset rst_ps7_0_50M ]
+  # Create instance: rst_ps7_0_axi, and set properties
+  set rst_ps7_0_axi [ create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset rst_ps7_0_axi ]
 
   # Create instance: v_tc_0, and set properties
   set v_tc_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:v_tc v_tc_0 ]
@@ -203,31 +212,74 @@ proc create_hier_cell_HDMI_SUB { parentCell nameHier } {
   ] $clk_wiz_0
 
 
-  # Create instance: ilslice_1, and set properties
-  set ilslice_1 [ create_bd_cell -type inline_hdl -vlnv xilinx.com:inline_hdl:ilslice ilslice_1 ]
+  # Create instance: ilslice_0, and set properties
+  set ilslice_0 [ create_bd_cell -type inline_hdl -vlnv xilinx.com:inline_hdl:ilslice ilslice_0 ]
   set_property -dict [list \
-    CONFIG.DIN_FROM {1} \
-    CONFIG.DIN_TO {1} \
-    CONFIG.DIN_WIDTH {2} \
-  ] $ilslice_1
+    CONFIG.DIN_FROM {0} \
+    CONFIG.DIN_TO {0} \
+    CONFIG.DIN_WIDTH {3} \
+  ] $ilslice_0
 
 
   # Create instance: axi_protocol_convert_0, and set properties
   set axi_protocol_convert_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_protocol_converter axi_protocol_convert_0 ]
+
+  # Create instance: v_mix_0, and set properties
+  set v_mix_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:v_mix v_mix_0 ]
+  set_property -dict [list \
+    CONFIG.LAYER1_ALPHA {true} \
+    CONFIG.LAYER1_UPSAMPLE {true} \
+    CONFIG.LAYER1_VIDEO_FORMAT {27} \
+    CONFIG.LAYER2_ALPHA {true} \
+    CONFIG.LAYER2_UPSAMPLE {true} \
+    CONFIG.LAYER2_VIDEO_FORMAT {27} \
+    CONFIG.LAYER3_ALPHA {true} \
+    CONFIG.LAYER3_UPSAMPLE {true} \
+    CONFIG.LAYER3_VIDEO_FORMAT {27} \
+  ] $v_mix_0
+
+
+  # Create instance: smartconnect_0, and set properties
+  set smartconnect_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:smartconnect smartconnect_0 ]
+  set_property CONFIG.NUM_SI {4} $smartconnect_0
+
+
+  # Create instance: rst_ps7_0_mixer, and set properties
+  set rst_ps7_0_mixer [ create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset rst_ps7_0_mixer ]
+  set_property CONFIG.C_AUX_RESET_HIGH {0} $rst_ps7_0_mixer
+
+
+  # Create instance: ilslice_2, and set properties
+  set ilslice_2 [ create_bd_cell -type inline_hdl -vlnv xilinx.com:inline_hdl:ilslice ilslice_2 ]
+  set_property -dict [list \
+    CONFIG.DIN_FROM {2} \
+    CONFIG.DIN_TO {2} \
+    CONFIG.DIN_WIDTH {3} \
+  ] $ilslice_2
+
+
+  # Create instance: rst_ps7_0_dma, and set properties
+  set rst_ps7_0_dma [ create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset rst_ps7_0_dma ]
 
   # Create interface connections
   connect_bd_intf_net -intf_net Conn1 [get_bd_intf_pins axi_iic_0/IIC] [get_bd_intf_pins IIC_0]
   connect_bd_intf_net -intf_net Conn2 [get_bd_intf_pins ps7_0_axi_periph/S00_AXI] [get_bd_intf_pins S00_AXI]
   connect_bd_intf_net -intf_net Conn4 [get_bd_intf_pins rgb2dvi_0/TMDS] [get_bd_intf_pins TMDS_0]
   connect_bd_intf_net -intf_net axi_protocol_convert_0_M_AXI [get_bd_intf_pins M00_AXI] [get_bd_intf_pins axi_protocol_convert_0/M_AXI]
-  connect_bd_intf_net -intf_net smartconnect_0_M00_AXI [get_bd_intf_pins ps7_0_axi_periph/M00_AXI] [get_bd_intf_pins v_frmbuf_rd_0/s_axi_CTRL]
+  connect_bd_intf_net -intf_net ps7_0_axi_periph_M00_AXI [get_bd_intf_pins ps7_0_axi_periph/M00_AXI] [get_bd_intf_pins v_frmbuf_rd_0/s_axi_CTRL]
+  connect_bd_intf_net -intf_net ps7_0_axi_periph_M05_AXI [get_bd_intf_pins ps7_0_axi_periph/M05_AXI] [get_bd_intf_pins v_mix_0/s_axi_CTRL]
+  connect_bd_intf_net -intf_net smartconnect_0_M00_AXI [get_bd_intf_pins smartconnect_0/M00_AXI] [get_bd_intf_pins axi_protocol_convert_0/S_AXI]
   connect_bd_intf_net -intf_net smartconnect_0_M01_AXI [get_bd_intf_pins axi_iic_0/S_AXI] [get_bd_intf_pins ps7_0_axi_periph/M01_AXI]
   connect_bd_intf_net -intf_net smartconnect_0_M02_AXI [get_bd_intf_pins clk_wiz_0/s_axi_lite] [get_bd_intf_pins ps7_0_axi_periph/M02_AXI]
   connect_bd_intf_net -intf_net smartconnect_0_M03_AXI [get_bd_intf_pins v_tc_0/ctrl] [get_bd_intf_pins ps7_0_axi_periph/M03_AXI]
   connect_bd_intf_net -intf_net smartconnect_0_M04_AXI [get_bd_intf_pins axi_gpio_0/S_AXI] [get_bd_intf_pins ps7_0_axi_periph/M04_AXI]
   connect_bd_intf_net -intf_net v_axi4s_vid_out_0_vid_io_out [get_bd_intf_pins v_axi4s_vid_out_0/vid_io_out] [get_bd_intf_pins rgb2dvi_0/RGB]
-  connect_bd_intf_net -intf_net v_frmbuf_rd_0_m_axi_mm_video [get_bd_intf_pins axi_protocol_convert_0/S_AXI] [get_bd_intf_pins v_frmbuf_rd_0/m_axi_mm_video]
-  connect_bd_intf_net -intf_net v_frmbuf_rd_0_m_axis_video [get_bd_intf_pins v_axi4s_vid_out_0/video_in] [get_bd_intf_pins v_frmbuf_rd_0/m_axis_video]
+  connect_bd_intf_net -intf_net v_frmbuf_rd_0_m_axi_mm_video [get_bd_intf_pins v_frmbuf_rd_0/m_axi_mm_video] [get_bd_intf_pins smartconnect_0/S00_AXI]
+  connect_bd_intf_net -intf_net v_frmbuf_rd_0_m_axis_video [get_bd_intf_pins v_frmbuf_rd_0/m_axis_video] [get_bd_intf_pins v_mix_0/s_axis_video]
+  connect_bd_intf_net -intf_net v_mix_0_m_axi_mm_video1 [get_bd_intf_pins v_mix_0/m_axi_mm_video1] [get_bd_intf_pins smartconnect_0/S01_AXI]
+  connect_bd_intf_net -intf_net v_mix_0_m_axi_mm_video2 [get_bd_intf_pins v_mix_0/m_axi_mm_video2] [get_bd_intf_pins smartconnect_0/S02_AXI]
+  connect_bd_intf_net -intf_net v_mix_0_m_axi_mm_video3 [get_bd_intf_pins v_mix_0/m_axi_mm_video3] [get_bd_intf_pins smartconnect_0/S03_AXI]
+  connect_bd_intf_net -intf_net v_mix_0_m_axis_video [get_bd_intf_pins v_axi4s_vid_out_0/video_in] [get_bd_intf_pins v_mix_0/m_axis_video]
   connect_bd_intf_net -intf_net v_tc_0_vtiming_out [get_bd_intf_pins v_tc_0/vtiming_out] [get_bd_intf_pins v_axi4s_vid_out_0/vtiming_in]
 
   # Create port connections
@@ -236,14 +288,18 @@ proc create_hier_cell_HDMI_SUB { parentCell nameHier } {
   [get_bd_pins v_tc_0/clk] \
   [get_bd_pins proc_sys_reset_0/slowest_sync_clk] \
   [get_bd_pins rgb2dvi_0/PixelClk]
+  connect_bd_net -net Net1  [get_bd_pins rst_ps7_0_dma/peripheral_aresetn] \
+  [get_bd_pins axi_protocol_convert_0/aresetn] \
+  [get_bd_pins v_axi4s_vid_out_0/aresetn]
   connect_bd_net -net axi_gpio_0_gpio_io_o  [get_bd_pins axi_gpio_0/gpio_io_o] \
+  [get_bd_pins ilslice_0/Din] \
   [get_bd_pins ilslice_1/Din] \
-  [get_bd_pins ilslice_0/Din]
+  [get_bd_pins ilslice_2/Din]
   connect_bd_net -net axi_iic_0_iic2intc_irpt  [get_bd_pins axi_iic_0/iic2intc_irpt] \
   [get_bd_pins iic2_intr]
   connect_bd_net -net clk_in1_1  [get_bd_pins axi_clk] \
   [get_bd_pins clk_wiz_0/clk_in1] \
-  [get_bd_pins rst_ps7_0_50M/slowest_sync_clk] \
+  [get_bd_pins rst_ps7_0_axi/slowest_sync_clk] \
   [get_bd_pins clk_wiz_0/s_axi_aclk] \
   [get_bd_pins v_tc_0/s_axi_aclk] \
   [get_bd_pins axi_gpio_0/s_axi_aclk] \
@@ -255,32 +311,42 @@ proc create_hier_cell_HDMI_SUB { parentCell nameHier } {
   connect_bd_net -net clk_wiz_0_locked1  [get_bd_pins clk_wiz_0/locked] \
   [get_bd_pins proc_sys_reset_0/dcm_locked]
   connect_bd_net -net ext_reset_in_1  [get_bd_pins resetn] \
-  [get_bd_pins rst_ps7_0_50M/ext_reset_in] \
-  [get_bd_pins rst_ps7_0_100M/ext_reset_in] \
-  [get_bd_pins proc_sys_reset_0/ext_reset_in]
-  connect_bd_net -net ilslice_1_Dout  [get_bd_pins ilslice_0/Dout] \
-  [get_bd_pins rst_ps7_0_100M/aux_reset_in]
-  connect_bd_net -net ilslice_1_Dout1  [get_bd_pins ilslice_1/Dout] \
+  [get_bd_pins rst_ps7_0_axi/ext_reset_in] \
+  [get_bd_pins rst_ps7_0_frmbuf/ext_reset_in] \
+  [get_bd_pins proc_sys_reset_0/ext_reset_in] \
+  [get_bd_pins rst_ps7_0_mixer/ext_reset_in] \
+  [get_bd_pins rst_ps7_0_dma/ext_reset_in]
+  connect_bd_net -net ilslice_1_Dout  [get_bd_pins ilslice_1/Dout] \
+  [get_bd_pins rst_ps7_0_frmbuf/aux_reset_in]
+  connect_bd_net -net ilslice_1_Dout1  [get_bd_pins ilslice_0/Dout] \
   [get_bd_pins proc_sys_reset_0/aux_reset_in]
+  connect_bd_net -net ilslice_2_Dout  [get_bd_pins ilslice_2/Dout] \
+  [get_bd_pins rst_ps7_0_mixer/aux_reset_in]
   connect_bd_net -net proc_sys_reset_0_peripheral_reset  [get_bd_pins proc_sys_reset_0/peripheral_reset] \
   [get_bd_pins v_axi4s_vid_out_0/vid_io_out_reset]
-  connect_bd_net -net rst_ps7_0_100M_peripheral_aresetn  [get_bd_pins rst_ps7_0_100M/peripheral_aresetn] \
-  [get_bd_pins v_frmbuf_rd_0/ap_rst_n] \
-  [get_bd_pins v_axi4s_vid_out_0/aresetn] \
-  [get_bd_pins axi_protocol_convert_0/aresetn]
-  connect_bd_net -net rst_ps7_0_50M_interconnect_aresetn  [get_bd_pins rst_ps7_0_50M/interconnect_aresetn] \
+  connect_bd_net -net rst_ps7_0_100M_peripheral_aresetn  [get_bd_pins rst_ps7_0_frmbuf/peripheral_aresetn] \
+  [get_bd_pins v_frmbuf_rd_0/ap_rst_n]
+  connect_bd_net -net rst_ps7_0_50M_interconnect_aresetn  [get_bd_pins rst_ps7_0_axi/interconnect_aresetn] \
   [get_bd_pins ps7_0_axi_periph/aresetn]
-  connect_bd_net -net rst_ps7_0_50M_peripheral_aresetn  [get_bd_pins rst_ps7_0_50M/peripheral_aresetn] \
+  connect_bd_net -net rst_ps7_0_50M_peripheral_aresetn  [get_bd_pins rst_ps7_0_axi/peripheral_aresetn] \
   [get_bd_pins clk_wiz_0/s_axi_aresetn] \
   [get_bd_pins v_tc_0/s_axi_aresetn] \
   [get_bd_pins axi_iic_0/s_axi_aresetn] \
   [get_bd_pins axi_gpio_0/s_axi_aresetn]
+  connect_bd_net -net rst_ps7_0_dma_interconnect_aresetn  [get_bd_pins rst_ps7_0_dma/interconnect_aresetn] \
+  [get_bd_pins smartconnect_0/aresetn]
+  connect_bd_net -net rst_ps7_0_mixer_peripheral_aresetn  [get_bd_pins rst_ps7_0_mixer/peripheral_aresetn] \
+  [get_bd_pins v_mix_0/ap_rst_n]
   connect_bd_net -net slowest_sync_clk_1  [get_bd_pins dma_clk] \
-  [get_bd_pins rst_ps7_0_100M/slowest_sync_clk] \
+  [get_bd_pins rst_ps7_0_frmbuf/slowest_sync_clk] \
   [get_bd_pins v_axi4s_vid_out_0/aclk] \
   [get_bd_pins v_frmbuf_rd_0/ap_clk] \
   [get_bd_pins ps7_0_axi_periph/aclk1] \
-  [get_bd_pins axi_protocol_convert_0/aclk]
+  [get_bd_pins axi_protocol_convert_0/aclk] \
+  [get_bd_pins v_mix_0/ap_clk] \
+  [get_bd_pins smartconnect_0/aclk] \
+  [get_bd_pins rst_ps7_0_mixer/slowest_sync_clk] \
+  [get_bd_pins rst_ps7_0_dma/slowest_sync_clk]
   connect_bd_net -net v_axi4s_vid_out_0_locked  [get_bd_pins v_axi4s_vid_out_0/locked] \
   [get_bd_pins lock_intr]
   connect_bd_net -net v_axi4s_vid_out_0_overflow  [get_bd_pins v_axi4s_vid_out_0/overflow] \
@@ -289,10 +355,10 @@ proc create_hier_cell_HDMI_SUB { parentCell nameHier } {
   [get_bd_pins underflow_intr]
   connect_bd_net -net v_axi4s_vid_out_0_vtg_ce  [get_bd_pins v_axi4s_vid_out_0/vtg_ce] \
   [get_bd_pins v_tc_0/clken]
-  connect_bd_net -net v_frmbuf_rd_0_field_id  [get_bd_pins v_frmbuf_rd_0/field_id] \
-  [get_bd_pins v_axi4s_vid_out_0/fid]
   connect_bd_net -net v_frmbuf_rd_0_interrupt  [get_bd_pins v_frmbuf_rd_0/interrupt] \
   [get_bd_pins dma_intr]
+  connect_bd_net -net v_mix_0_interrupt  [get_bd_pins v_mix_0/interrupt] \
+  [get_bd_pins vmix_intr]
   connect_bd_net -net v_tc_0_irq  [get_bd_pins v_tc_0/irq] \
   [get_bd_pins vtc_intr]
   connect_bd_net -net xlconstant_0_dout  [get_bd_pins xlconstant_0/dout] \
