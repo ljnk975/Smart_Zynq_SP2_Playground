@@ -110,9 +110,21 @@ This command open Vivado on GUI mode. Enjoy editing your project!
 make vivado-export
 ```
 
-This command export block design project as TCL file locate on bd/ folder.
+This command export project as TCL file scripts/project.tcl and export block design files as TCL files locate on bd/ folder.
 
-## TODO: vivado import bd
+## Update vivado design:
+
+Vivado can manage all RTL files, contraints file we used in this project. The only exception is the block design (BD) files.
+
+The vivado-export make target export block design files as TCL files. We can update block design in the project with this:
+
+```
+make vivado-import
+```
+
+This command read block design TCL files in bd/ folder, and re-create block design in current woking WORK/Vivado project.
+
+**NOTE: this command will delete all block design files in WORK/Vivado project**
 
 # Petalinux edit flow
 

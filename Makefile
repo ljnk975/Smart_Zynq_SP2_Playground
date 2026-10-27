@@ -109,6 +109,11 @@ vivado-build: _trigger_rebuild $(VIVADO_DIR)/$(VIVADO_PROJ_NAME).xsa
 vivado-export: $(VIVADO_DIR)/$(VIVADO_PROJ_NAME).xpr
 	cd $(VIVADO_DIR); $(VIVADO) $(VIVADO_PARAMS) -script $(VIVADO_SCRIPT_AB_DIR)/export.tcl $(VIVADO_PROJ_NAME).xpr -tclargs --origin_dir $(PWD)
 
+# Import project
+.PHONY: vivado-import
+vivado-import: $(VIVADO_DIR)/$(VIVADO_PROJ_NAME).xpr
+	cd $(VIVADO_DIR); $(VIVADO) $(VIVADO_PARAMS) -script $(VIVADO_SCRIPT_AB_DIR)/import.tcl $(VIVADO_PROJ_NAME).xpr -tclargs --origin_dir $(PWD)
+
 # Open project
 .PHONY: vivado-gui
 vivado-gui: $(VIVADO_DIR)/$(VIVADO_PROJ_NAME).xpr
