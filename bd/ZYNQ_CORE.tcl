@@ -341,8 +341,8 @@ proc create_root_design { parentCell } {
     CONFIG.PCW_EN_PTP_ENET1 {0} \
     CONFIG.PCW_EN_QSPI {1} \
     CONFIG.PCW_EN_RST0_PORT {1} \
-    CONFIG.PCW_EN_RST1_PORT {0} \
-    CONFIG.PCW_EN_RST2_PORT {0} \
+    CONFIG.PCW_EN_RST1_PORT {1} \
+    CONFIG.PCW_EN_RST2_PORT {1} \
     CONFIG.PCW_EN_RST3_PORT {0} \
     CONFIG.PCW_EN_SDIO0 {1} \
     CONFIG.PCW_EN_SDIO1 {0} \
@@ -828,6 +828,8 @@ proc create_root_design { parentCell } {
   [get_bd_pins ilconcat_0/In6]
   connect_bd_net -net HDMI_SUB_vtc_intr  [get_bd_pins HDMI_SUB/vtc_intr] \
   [get_bd_pins ilconcat_0/In2]
+  connect_bd_net -net axi_resetn_1  [get_bd_pins processing_system7_0/FCLK_RESET1_N] \
+  [get_bd_pins HDMI_SUB/axi_resetn]
   connect_bd_net -net ilconcat_0_dout  [get_bd_pins ilconcat_0/dout] \
   [get_bd_pins processing_system7_0/IRQ_F2P]
   connect_bd_net -net processing_system7_0_FCLK_CLK0  [get_bd_pins processing_system7_0/FCLK_CLK0] \
@@ -839,8 +841,9 @@ proc create_root_design { parentCell } {
   [get_bd_pins processing_system7_0/S_AXI_HP0_ACLK] \
   [get_bd_pins HDMI_SUB/dma_clk]
   connect_bd_net -net processing_system7_0_FCLK_RESET0_N  [get_bd_pins processing_system7_0/FCLK_RESET0_N] \
-  [get_bd_pins HDMI_SUB/resetn] \
   [get_bd_pins ilvector_logic_0/Op1]
+  connect_bd_net -net processing_system7_0_FCLK_RESET2_N  [get_bd_pins processing_system7_0/FCLK_RESET2_N] \
+  [get_bd_pins HDMI_SUB/dma_resetn]
   connect_bd_net -net util_vector_logic_0_Res  [get_bd_pins ilvector_logic_0/Res] \
   [get_bd_pins gmii_to_rgmii_0/tx_reset] \
   [get_bd_pins gmii_to_rgmii_0/rx_reset]
