@@ -85,3 +85,25 @@ set_property -dict {PACKAGE_PIN J20 IOSTANDARD LVCMOS33} [get_ports GPIO_EMIO[4]
 
 # LED
 set_property -dict {PACKAGE_PIN P20 IOSTANDARD LVCMOS33} [get_ports GPIO_EMIO[5]]
+
+# Camera
+set_property -dict {PACKAGE_PIN T22  IOSTANDARD LVCMOS33} [get_ports CAM0_SCL]
+set_property -dict {PACKAGE_PIN V22  IOSTANDARD LVCMOS33} [get_ports CAM0_SDA]
+
+set_property -dict {PACKAGE_PIN Y20  IOSTANDARD LVCMOS33} [get_ports CAM0_PWD]
+set_property -dict {PACKAGE_PIN AA22 IOSTANDARD LVCMOS33} [get_ports CAM0_RST]
+set_property -dict {PACKAGE_PIN AA21 IOSTANDARD LVCMOS33} [get_ports CAM0_VSYNC]
+set_property -dict {PACKAGE_PIN AB20 IOSTANDARD LVCMOS33} [get_ports CAM0_HSYNC]
+
+set_property -dict {PACKAGE_PIN U22  IOSTANDARD LVCMOS33} [get_ports CAM0_D[0]]
+set_property -dict {PACKAGE_PIN W22  IOSTANDARD LVCMOS33} [get_ports CAM0_D[1]]
+set_property -dict {PACKAGE_PIN Y21  IOSTANDARD LVCMOS33} [get_ports CAM0_D[2]]
+set_property -dict {PACKAGE_PIN AB22 IOSTANDARD LVCMOS33} [get_ports CAM0_D[3]]
+set_property -dict {PACKAGE_PIN AB21 IOSTANDARD LVCMOS33} [get_ports CAM0_D[4]]
+set_property -dict {PACKAGE_PIN AB19 IOSTANDARD LVCMOS33} [get_ports CAM0_D[5]]
+set_property -dict {PACKAGE_PIN AA19 IOSTANDARD LVCMOS33} [get_ports CAM0_D[6]]
+set_property -dict {PACKAGE_PIN AB16 IOSTANDARD LVCMOS33} [get_ports CAM0_D[7]]
+
+set_property -dict {PACKAGE_PIN Y18  IOSTANDARD LVCMOS33} [get_ports CAM0_CLK]
+
+create_clock -period 10 -name CAM0_CLK [get_ports CAM0_CLK]

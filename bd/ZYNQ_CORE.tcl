@@ -138,6 +138,9 @@ xilinx.com:ip:v_tc:*\
 xilinx.com:ip:clk_wiz:*\
 xilinx.com:ip:axi_protocol_converter:*\
 xilinx.com:ip:v_mix:*\
+xilinx.com:ip:axis_clock_converter:*\
+xilinx.com:ip:v_frmbuf_wr:*\
+xilinx.com:ip:v_demosaic:*\
 digilentinc.com:ip:rgb2dvi:*\
 "
 
@@ -169,6 +172,7 @@ if { $bCheckIPsPassed != 1 } {
 
 
 source "$origin_dir/bd/HDMI_SUB.tcl"
+source "$origin_dir/bd/CAMERA_SUB.tcl"
 
 
 # Procedure to create entire design; Provide argument to make
@@ -222,9 +226,34 @@ proc create_root_design { parentCell } {
 
   set TMDS_0 [ create_bd_intf_port -mode Master -vlnv digilentinc.com:interface:tmds_rtl:1.0 TMDS_0 ]
 
+  set vid_in [ create_bd_intf_port -mode Slave -vlnv xilinx.com:interface:axis_rtl:1.0 vid_in ]
+  set_property -dict [ list \
+   CONFIG.HAS_TKEEP {1} \
+   CONFIG.HAS_TLAST {1} \
+   CONFIG.HAS_TREADY {1} \
+   CONFIG.HAS_TSTRB {1} \
+   CONFIG.LAYERED_METADATA {undef} \
+   CONFIG.TDATA_NUM_BYTES {1} \
+   CONFIG.TDEST_WIDTH {1} \
+   CONFIG.TID_WIDTH {1} \
+   CONFIG.TUSER_WIDTH {1} \
+   ] $vid_in
+
+  set vid_iic [ create_bd_intf_port -mode Master -vlnv xilinx.com:interface:iic_rtl:1.0 vid_iic ]
+
 
   # Create ports
   set ENET0_EXT_INTIN [ create_bd_port -dir I -type intr ENET0_EXT_INTIN ]
+  set vid_resetn [ create_bd_port -dir O -from 0 -to 0 vid_resetn ]
+  set vid_in_clk [ create_bd_port -dir I -type clk -freq_hz 100000000 vid_in_clk ]
+  set_property -dict [ list \
+   CONFIG.ASSOCIATED_RESET {vid_in_resetn} \
+ ] $vid_in_clk
+  set vid_in_resetn [ create_bd_port -dir I -type rst vid_in_resetn ]
+  set_property -dict [ list \
+   CONFIG.POLARITY {ACTIVE_LOW} \
+ ] $vid_in_resetn
+  set vid_pwd [ create_bd_port -dir O -from 0 -to 0 vid_pwd ]
 
   # Create instance: processing_system7_0, and set properties
   set processing_system7_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:processing_system7 processing_system7_0 ]
@@ -239,7 +268,7 @@ proc create_root_design { parentCell } {
     CONFIG.PCW_ACT_FPGA0_PERIPHERAL_FREQMHZ {200.000000} \
     CONFIG.PCW_ACT_FPGA1_PERIPHERAL_FREQMHZ {50.000000} \
     CONFIG.PCW_ACT_FPGA2_PERIPHERAL_FREQMHZ {150.000000} \
-    CONFIG.PCW_ACT_FPGA3_PERIPHERAL_FREQMHZ {10.000000} \
+    CONFIG.PCW_ACT_FPGA3_PERIPHERAL_FREQMHZ {100.000000} \
     CONFIG.PCW_ACT_I2C_PERIPHERAL_FREQMHZ {50} \
     CONFIG.PCW_ACT_PCAP_PERIPHERAL_FREQMHZ {200.000000} \
     CONFIG.PCW_ACT_QSPI_PERIPHERAL_FREQMHZ {200.000000} \
@@ -269,7 +298,7 @@ proc create_root_design { parentCell } {
     CONFIG.PCW_CLK0_FREQ {200000000} \
     CONFIG.PCW_CLK1_FREQ {50000000} \
     CONFIG.PCW_CLK2_FREQ {150000000} \
-    CONFIG.PCW_CLK3_FREQ {10000000} \
+    CONFIG.PCW_CLK3_FREQ {100000000} \
     CONFIG.PCW_CPU_CPU_6X4X_MAX_RANGE {767} \
     CONFIG.PCW_CPU_PERIPHERAL_CLKSRC {ARM PLL} \
     CONFIG.PCW_CRYSTAL_PERIPHERAL_FREQMHZ {33.3333333} \
@@ -298,7 +327,7 @@ proc create_root_design { parentCell } {
     CONFIG.PCW_EN_CLK0_PORT {1} \
     CONFIG.PCW_EN_CLK1_PORT {1} \
     CONFIG.PCW_EN_CLK2_PORT {1} \
-    CONFIG.PCW_EN_CLK3_PORT {0} \
+    CONFIG.PCW_EN_CLK3_PORT {1} \
     CONFIG.PCW_EN_CLKTRIG0_PORT {0} \
     CONFIG.PCW_EN_CLKTRIG1_PORT {0} \
     CONFIG.PCW_EN_CLKTRIG2_PORT {0} \
@@ -364,13 +393,15 @@ proc create_root_design { parentCell } {
     CONFIG.PCW_FCLK_CLK0_BUF {TRUE} \
     CONFIG.PCW_FCLK_CLK1_BUF {FALSE} \
     CONFIG.PCW_FCLK_CLK2_BUF {FALSE} \
+    CONFIG.PCW_FCLK_CLK3_BUF {FALSE} \
     CONFIG.PCW_FPGA0_PERIPHERAL_FREQMHZ {200} \
     CONFIG.PCW_FPGA1_PERIPHERAL_FREQMHZ {50} \
     CONFIG.PCW_FPGA2_PERIPHERAL_FREQMHZ {150} \
-    CONFIG.PCW_FPGA3_PERIPHERAL_FREQMHZ {50} \
+    CONFIG.PCW_FPGA3_PERIPHERAL_FREQMHZ {100} \
     CONFIG.PCW_FPGA_FCLK0_ENABLE {1} \
     CONFIG.PCW_FPGA_FCLK1_ENABLE {1} \
     CONFIG.PCW_FPGA_FCLK2_ENABLE {1} \
+    CONFIG.PCW_FPGA_FCLK3_ENABLE {1} \
     CONFIG.PCW_GP0_EN_MODIFIABLE_TXN {1} \
     CONFIG.PCW_GP0_NUM_READ_THREADS {4} \
     CONFIG.PCW_GP0_NUM_WRITE_THREADS {4} \
@@ -643,6 +674,7 @@ proc create_root_design { parentCell } {
     CONFIG.PCW_SPI_PERIPHERAL_CLKSRC {IO PLL} \
     CONFIG.PCW_SPI_PERIPHERAL_FREQMHZ {166.666666} \
     CONFIG.PCW_SPI_PERIPHERAL_VALID {1} \
+    CONFIG.PCW_S_AXI_HP1_DATA_WIDTH {64} \
     CONFIG.PCW_TPIU_PERIPHERAL_CLKSRC {External} \
     CONFIG.PCW_TRACE_INTERNAL_WIDTH {2} \
     CONFIG.PCW_TRACE_PERIPHERAL_ENABLE {0} \
@@ -756,14 +788,14 @@ proc create_root_design { parentCell } {
     CONFIG.PCW_USE_FABRIC_INTERRUPT {1} \
     CONFIG.PCW_USE_HIGH_OCM {0} \
     CONFIG.PCW_USE_M_AXI_GP0 {1} \
-    CONFIG.PCW_USE_M_AXI_GP1 {0} \
+    CONFIG.PCW_USE_M_AXI_GP1 {1} \
     CONFIG.PCW_USE_PROC_EVENT_BUS {0} \
     CONFIG.PCW_USE_PS_SLCR_REGISTERS {0} \
     CONFIG.PCW_USE_S_AXI_ACP {0} \
     CONFIG.PCW_USE_S_AXI_GP0 {0} \
     CONFIG.PCW_USE_S_AXI_GP1 {0} \
     CONFIG.PCW_USE_S_AXI_HP0 {1} \
-    CONFIG.PCW_USE_S_AXI_HP1 {0} \
+    CONFIG.PCW_USE_S_AXI_HP1 {1} \
     CONFIG.PCW_USE_S_AXI_HP2 {0} \
     CONFIG.PCW_USE_S_AXI_HP3 {0} \
     CONFIG.PCW_USE_TRACE {0} \
@@ -791,12 +823,17 @@ proc create_root_design { parentCell } {
   # Create instance: HDMI_SUB
   create_hier_cell_HDMI_SUB [current_bd_instance .] HDMI_SUB
 
-  # Create instance: ilconcat_0, and set properties
-  set ilconcat_0 [ create_bd_cell -type inline_hdl -vlnv xilinx.com:inline_hdl:ilconcat ilconcat_0 ]
-  set_property CONFIG.NUM_PORTS {7} $ilconcat_0
+  # Create instance: CAMERA_SUB
+  create_hier_cell_CAMERA_SUB [current_bd_instance .] CAMERA_SUB
+
+  # Create instance: intr_concat, and set properties
+  set intr_concat [ create_bd_cell -type inline_hdl -vlnv xilinx.com:inline_hdl:ilconcat intr_concat ]
+  set_property CONFIG.NUM_PORTS {10} $intr_concat
 
 
   # Create interface connections
+  connect_bd_intf_net -intf_net CAMERA_SUB_IIC_0 [get_bd_intf_ports vid_iic] [get_bd_intf_pins CAMERA_SUB/vid_iic]
+  connect_bd_intf_net -intf_net Camera_M00_AXI [get_bd_intf_pins CAMERA_SUB/M00_AXI] [get_bd_intf_pins processing_system7_0/S_AXI_HP1]
   connect_bd_intf_net -intf_net HDMI_SUB_IIC_0 [get_bd_intf_ports IIC_0] [get_bd_intf_pins HDMI_SUB/IIC_0]
   connect_bd_intf_net -intf_net HDMI_SUB_M00_AXI [get_bd_intf_pins processing_system7_0/S_AXI_HP0] [get_bd_intf_pins HDMI_SUB/M00_AXI]
   connect_bd_intf_net -intf_net HDMI_SUB_TMDS_0 [get_bd_intf_ports TMDS_0] [get_bd_intf_pins HDMI_SUB/TMDS_0]
@@ -808,38 +845,56 @@ proc create_root_design { parentCell } {
   connect_bd_intf_net -intf_net processing_system7_0_GPIO_0 [get_bd_intf_ports GPIO_0] [get_bd_intf_pins processing_system7_0/GPIO_0]
   connect_bd_intf_net -intf_net processing_system7_0_MDIO_ETHERNET_0 [get_bd_intf_pins processing_system7_0/MDIO_ETHERNET_0] [get_bd_intf_pins gmii_to_rgmii_0/MDIO_GEM]
   connect_bd_intf_net -intf_net processing_system7_0_M_AXI_GP0 [get_bd_intf_pins processing_system7_0/M_AXI_GP0] [get_bd_intf_pins HDMI_SUB/S00_AXI]
+  connect_bd_intf_net -intf_net processing_system7_0_M_AXI_GP1 [get_bd_intf_pins processing_system7_0/M_AXI_GP1] [get_bd_intf_pins CAMERA_SUB/S00_AXI]
   connect_bd_intf_net -intf_net processing_system7_0_SPI_0 [get_bd_intf_ports SPI_0] [get_bd_intf_pins processing_system7_0/SPI_0]
   connect_bd_intf_net -intf_net processing_system7_0_UART_0 [get_bd_intf_ports UART_0] [get_bd_intf_pins processing_system7_0/UART_0]
+  connect_bd_intf_net -intf_net s_axis_video_0_1 [get_bd_intf_ports vid_in] [get_bd_intf_pins CAMERA_SUB/vid_in]
 
   # Create port connections
+  connect_bd_net -net CAMERA_SUB_Dout_0  [get_bd_pins CAMERA_SUB/vid_pwd] \
+  [get_bd_ports vid_pwd]
+  connect_bd_net -net CAMERA_SUB_demosaic_intr  [get_bd_pins CAMERA_SUB/demosaic_intr] \
+  [get_bd_pins intr_concat/In9]
+  connect_bd_net -net CAMERA_SUB_dma_intr  [get_bd_pins CAMERA_SUB/dma_intr] \
+  [get_bd_pins intr_concat/In8]
+  connect_bd_net -net CAMERA_SUB_iic_intr  [get_bd_pins CAMERA_SUB/iic_intr] \
+  [get_bd_pins intr_concat/In7]
+  connect_bd_net -net Camera_gpio_io_o_0  [get_bd_pins CAMERA_SUB/vid_resetn] \
+  [get_bd_ports vid_resetn]
   connect_bd_net -net ENET0_EXT_INTIN_0_1  [get_bd_ports ENET0_EXT_INTIN] \
   [get_bd_pins processing_system7_0/ENET0_EXT_INTIN]
   connect_bd_net -net HDMI_SUB_dma_intr  [get_bd_pins HDMI_SUB/dma_intr] \
-  [get_bd_pins ilconcat_0/In1]
+  [get_bd_pins intr_concat/In1]
   connect_bd_net -net HDMI_SUB_iic2_intr  [get_bd_pins HDMI_SUB/iic2_intr] \
-  [get_bd_pins ilconcat_0/In0]
+  [get_bd_pins intr_concat/In0]
   connect_bd_net -net HDMI_SUB_lock_intr  [get_bd_pins HDMI_SUB/lock_intr] \
-  [get_bd_pins ilconcat_0/In3]
+  [get_bd_pins intr_concat/In3]
   connect_bd_net -net HDMI_SUB_overflow_intr  [get_bd_pins HDMI_SUB/overflow_intr] \
-  [get_bd_pins ilconcat_0/In4]
+  [get_bd_pins intr_concat/In4]
   connect_bd_net -net HDMI_SUB_underflow_intr  [get_bd_pins HDMI_SUB/underflow_intr] \
-  [get_bd_pins ilconcat_0/In5]
+  [get_bd_pins intr_concat/In5]
   connect_bd_net -net HDMI_SUB_vmix_intr  [get_bd_pins HDMI_SUB/vmix_intr] \
-  [get_bd_pins ilconcat_0/In6]
+  [get_bd_pins intr_concat/In6]
   connect_bd_net -net HDMI_SUB_vtc_intr  [get_bd_pins HDMI_SUB/vtc_intr] \
-  [get_bd_pins ilconcat_0/In2]
+  [get_bd_pins intr_concat/In2]
   connect_bd_net -net axi_resetn_1  [get_bd_pins processing_system7_0/FCLK_RESET1_N] \
+  [get_bd_pins CAMERA_SUB/axi_resetn] \
   [get_bd_pins HDMI_SUB/axi_resetn]
-  connect_bd_net -net ilconcat_0_dout  [get_bd_pins ilconcat_0/dout] \
+  connect_bd_net -net intr_concat_dout  [get_bd_pins intr_concat/dout] \
   [get_bd_pins processing_system7_0/IRQ_F2P]
   connect_bd_net -net processing_system7_0_FCLK_CLK0  [get_bd_pins processing_system7_0/FCLK_CLK0] \
   [get_bd_pins gmii_to_rgmii_0/clkin]
   connect_bd_net -net processing_system7_0_FCLK_CLK1  [get_bd_pins processing_system7_0/FCLK_CLK1] \
+  [get_bd_pins processing_system7_0/M_AXI_GP1_ACLK] \
+  [get_bd_pins CAMERA_SUB/axi_clk] \
   [get_bd_pins processing_system7_0/M_AXI_GP0_ACLK] \
   [get_bd_pins HDMI_SUB/axi_clk]
   connect_bd_net -net processing_system7_0_FCLK_CLK2  [get_bd_pins processing_system7_0/FCLK_CLK2] \
   [get_bd_pins processing_system7_0/S_AXI_HP0_ACLK] \
   [get_bd_pins HDMI_SUB/dma_clk]
+  connect_bd_net -net processing_system7_0_FCLK_CLK3  [get_bd_pins processing_system7_0/FCLK_CLK3] \
+  [get_bd_pins CAMERA_SUB/dma_clk] \
+  [get_bd_pins processing_system7_0/S_AXI_HP1_ACLK]
   connect_bd_net -net processing_system7_0_FCLK_RESET0_N  [get_bd_pins processing_system7_0/FCLK_RESET0_N] \
   [get_bd_pins ilvector_logic_0/Op1]
   connect_bd_net -net processing_system7_0_FCLK_RESET2_N  [get_bd_pins processing_system7_0/FCLK_RESET2_N] \
@@ -847,18 +902,27 @@ proc create_root_design { parentCell } {
   connect_bd_net -net util_vector_logic_0_Res  [get_bd_pins ilvector_logic_0/Res] \
   [get_bd_pins gmii_to_rgmii_0/tx_reset] \
   [get_bd_pins gmii_to_rgmii_0/rx_reset]
+  connect_bd_net -net vid_io_in_clk_0_1  [get_bd_ports vid_in_clk] \
+  [get_bd_pins CAMERA_SUB/vid_in_clk]
+  connect_bd_net -net vid_io_in_reset_0_1  [get_bd_ports vid_in_resetn] \
+  [get_bd_pins CAMERA_SUB/vid_in_resetn]
 
   # Create address segments
   assign_bd_address -offset 0x42010000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs HDMI_SUB/axi_gpio_0/S_AXI/Reg] -force
+  assign_bd_address -offset 0x81200000 -range 0x00010000 -with_name SEG_axi_gpio_0_Reg_1 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs CAMERA_SUB/axi_gpio_0/S_AXI/Reg] -force
   assign_bd_address -offset 0x42020000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs HDMI_SUB/axi_iic_0/S_AXI/Reg] -force
+  assign_bd_address -offset 0x81600000 -range 0x00010000 -with_name SEG_axi_iic_0_Reg_1 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs CAMERA_SUB/axi_iic_0/S_AXI/Reg] -force
   assign_bd_address -offset 0x42030000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs HDMI_SUB/clk_wiz_0/s_axi_lite/Reg] -force
+  assign_bd_address -offset 0x83C10000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs CAMERA_SUB/v_demosaic_0/s_axi_CTRL/Reg] -force
   assign_bd_address -offset 0x42000000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs HDMI_SUB/v_frmbuf_rd_0/s_axi_CTRL/Reg] -force
+  assign_bd_address -offset 0x83C00000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs CAMERA_SUB/v_frmbuf_wr_0/s_axi_CTRL/Reg] -force
   assign_bd_address -offset 0x42050000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs HDMI_SUB/v_mix_0/s_axi_CTRL/Reg] -force
   assign_bd_address -offset 0x42040000 -range 0x00010000 -target_address_space [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs HDMI_SUB/v_tc_0/ctrl/Reg] -force
   assign_bd_address -offset 0x00000000 -range 0x20000000 -target_address_space [get_bd_addr_spaces HDMI_SUB/v_frmbuf_rd_0/Data_m_axi_mm_video] [get_bd_addr_segs processing_system7_0/S_AXI_HP0/HP0_DDR_LOWOCM] -force
   assign_bd_address -offset 0x00000000 -range 0x20000000 -target_address_space [get_bd_addr_spaces HDMI_SUB/v_mix_0/Data_m_axi_mm_video1] [get_bd_addr_segs processing_system7_0/S_AXI_HP0/HP0_DDR_LOWOCM] -force
   assign_bd_address -offset 0x00000000 -range 0x20000000 -target_address_space [get_bd_addr_spaces HDMI_SUB/v_mix_0/Data_m_axi_mm_video2] [get_bd_addr_segs processing_system7_0/S_AXI_HP0/HP0_DDR_LOWOCM] -force
   assign_bd_address -offset 0x00000000 -range 0x20000000 -target_address_space [get_bd_addr_spaces HDMI_SUB/v_mix_0/Data_m_axi_mm_video3] [get_bd_addr_segs processing_system7_0/S_AXI_HP0/HP0_DDR_LOWOCM] -force
+  assign_bd_address -offset 0x00000000 -range 0x20000000 -target_address_space [get_bd_addr_spaces CAMERA_SUB/v_frmbuf_wr_0/Data_m_axi_mm_video] [get_bd_addr_segs processing_system7_0/S_AXI_HP1/HP1_DDR_LOWOCM] -force
 
 
   # Restore current instance

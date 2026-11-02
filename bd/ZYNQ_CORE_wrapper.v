@@ -64,6 +64,21 @@ module ZYNQ_CORE_wrapper
     FIXED_IO_ps_porb,
     FIXED_IO_ps_srstb,
     GPIO_0_tri_io,
+    vid_pwd,
+    vid_resetn,
+    vid_in_clk,
+    vid_in_resetn,
+    vid_in_tready,
+    vid_in_tvalid,
+    vid_in_tlast,
+    vid_in_tuser,
+    vid_in_tid,
+    vid_in_tdest,
+    vid_in_tdata,
+    vid_in_tkeep,
+    vid_in_tstrb,
+    vid_iic_scl_io,
+    vid_iic_sda_io,
     MDIO_PHY_0_mdc,
     MDIO_PHY_0_mdio_io,
     RGMII_0_rd,
@@ -110,6 +125,21 @@ module ZYNQ_CORE_wrapper
   inout FIXED_IO_ps_porb;
   inout FIXED_IO_ps_srstb;
   inout [5:0]GPIO_0_tri_io;
+  output vid_pwd;
+  output vid_resetn;
+  input vid_in_clk;
+  input vid_in_resetn;
+  output vid_in_tready;
+  input vid_in_tvalid;
+  input vid_in_tlast;
+  input vid_in_tuser;
+  input vid_in_tid;
+  input vid_in_tdest;
+  input [7:0]vid_in_tdata;
+  input [1:0]vid_in_tkeep;
+  input [1:0]vid_in_tstrb;
+  inout vid_iic_scl_io;
+  inout vid_iic_sda_io;
   output MDIO_PHY_0_mdc;
   inout MDIO_PHY_0_mdio_io;
   input [3:0]RGMII_0_rd;
@@ -179,6 +209,27 @@ module ZYNQ_CORE_wrapper
   wire [3:3]GPIO_0_tri_t_3;
   wire [4:4]GPIO_0_tri_t_4;
   wire [5:5]GPIO_0_tri_t_5;
+  wire vid_pwd;
+  wire vid_resetn;
+  wire vid_in_clk;
+  wire vid_in_resetn;
+  wire vid_in_tready;
+  wire vid_in_tvalid;
+  wire vid_in_tlast;
+  wire vid_in_tuser;
+  wire vid_in_tid;
+  wire vid_in_tdest;
+  wire [7:0]vid_in_tdata;
+  wire [0:0]vid_in_tkeep;
+  wire [0:0]vid_in_tstrb;
+  wire vid_iic_scl_i;
+  wire vid_iic_scl_io;
+  wire vid_iic_scl_o;
+  wire vid_iic_scl_t;
+  wire vid_iic_sda_i;
+  wire vid_iic_sda_io;
+  wire vid_iic_sda_o;
+  wire vid_iic_sda_t;
   wire MDIO_PHY_0_mdc;
   wire MDIO_PHY_0_mdio_i;
   wire MDIO_PHY_0_mdio_io;
@@ -258,6 +309,16 @@ module ZYNQ_CORE_wrapper
         .IO(MDIO_PHY_0_mdio_io),
         .O(MDIO_PHY_0_mdio_i),
         .T(MDIO_PHY_0_mdio_t));
+  IOBUF vid_iic_scl_iobuf
+       (.I(vid_iic_scl_o),
+        .IO(vid_iic_scl_io),
+        .O(vid_iic_scl_i),
+        .T(vid_iic_scl_t));
+  IOBUF vid_iic_sda_iobuf
+       (.I(vid_iic_sda_o),
+        .IO(vid_iic_sda_io),
+        .O(vid_iic_sda_i),
+        .T(vid_iic_sda_t));
   IOBUF SPI_0_io0_iobuf
        (.I(SPI_0_io0_o),
         .IO(SPI_0_io0_io),
@@ -309,6 +370,25 @@ module ZYNQ_CORE_wrapper
         .GPIO_0_tri_i({GPIO_0_tri_i_5,GPIO_0_tri_i_4,GPIO_0_tri_i_3,GPIO_0_tri_i_2,GPIO_0_tri_i_1,GPIO_0_tri_i_0}),
         .GPIO_0_tri_o({GPIO_0_tri_o_5,GPIO_0_tri_o_4,GPIO_0_tri_o_3,GPIO_0_tri_o_2,GPIO_0_tri_o_1,GPIO_0_tri_o_0}),
         .GPIO_0_tri_t({GPIO_0_tri_t_5,GPIO_0_tri_t_4,GPIO_0_tri_t_3,GPIO_0_tri_t_2,GPIO_0_tri_t_1,GPIO_0_tri_t_0}),
+        .vid_pwd(vid_pwd),
+        .vid_resetn(vid_resetn),
+        .vid_in_clk(vid_in_clk),
+        .vid_in_resetn(vid_in_resetn),
+        .vid_in_tready(vid_in_tready),
+        .vid_in_tvalid(vid_in_tvalid),
+        .vid_in_tlast(vid_in_tlast),
+        .vid_in_tuser(vid_in_tuser),
+        .vid_in_tid(vid_in_tid),
+        .vid_in_tdest(vid_in_tdest),
+        .vid_in_tdata(vid_in_tdata),
+        .vid_in_tkeep(vid_in_tkeep),
+        .vid_in_tstrb(vid_in_tstrb),
+        .vid_iic_scl_i(vid_iic_scl_i),
+        .vid_iic_scl_o(vid_iic_scl_o),
+        .vid_iic_scl_t(vid_iic_scl_t),
+        .vid_iic_sda_i(vid_iic_sda_i),
+        .vid_iic_sda_o(vid_iic_sda_o),
+        .vid_iic_sda_t(vid_iic_sda_t),
         .MDIO_PHY_0_mdc(MDIO_PHY_0_mdc),
         .MDIO_PHY_0_mdio_i(MDIO_PHY_0_mdio_i),
         .MDIO_PHY_0_mdio_o(MDIO_PHY_0_mdio_o),

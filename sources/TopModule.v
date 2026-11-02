@@ -45,6 +45,15 @@ module TopModule(
     output [2:0] TMDS_0_data_n,
     output [2:0] TMDS_0_data_p,
 
+    input  CAM0_CLK,
+    output CAM0_PWD,
+    output CAM0_RST,
+    input  CAM0_VSYNC,
+    input  CAM0_HSYNC,
+    input  [7:0] CAM0_D,
+    inout  CAM0_SCL,
+    inout  CAM0_SDA,
+
     output MDIO_PHY_mdc,
     inout  MDIO_PHY_mdio_io,
     input  [3:0] RGMII_rd,
@@ -59,9 +68,39 @@ module TopModule(
     output UART_txd
 );
 
+    wire vid_pwd;
+    wire vid_resetn;
+    wire vid_in_clk;
+    wire vid_in_resetn;
+    wire vid_in_tready;
+    wire vid_in_tvalid;
+    wire vid_in_tlast;
+    wire vid_in_tuser;
+    wire vid_in_tid;
+    wire vid_in_tdest;
+    wire [7:0] vid_in_tdata;
+    wire [0:0] vid_in_tkeep;
+    wire [0:0] vid_in_tstrb;
 
  ZYNQ_CORE_wrapper zynq_u(
     .GPIO_0_tri_io(GPIO_EMIO),
+
+    .vid_pwd(vid_pwd),
+    .vid_resetn(vid_resetn),
+    .vid_in_clk(vid_in_clk),
+    .vid_in_resetn(vid_in_resetn),
+    .vid_in_tready(vid_in_tready),
+    .vid_in_tvalid(vid_in_tvalid),
+    .vid_in_tlast(vid_in_tlast),
+    .vid_in_tuser(vid_in_tuser),
+    .vid_in_tid(vid_in_tid),
+    .vid_in_tdest(vid_in_tdest),
+    .vid_in_tdata(vid_in_tdata),
+    .vid_in_tkeep(vid_in_tkeep),
+    .vid_in_tstrb(vid_in_tstrb),
+
+    .vid_iic_scl_io(CAM0_SCL),
+    .vid_iic_sda_io(CAM0_SDA),
 
     .SPI_0_sck_io(SPI_0_sck_io),
     .SPI_0_ss_io(SPI_0_ss_io),
@@ -88,5 +127,61 @@ module TopModule(
     .UART_0_rxd(UART_rxd),
     .UART_0_txd(UART_txd)
  );
+
+    ///-> Camera output
+    assign CAM0_PWD = vid_pwd;
+    assign CAM0_RST = vid_resetn;
+
+    ///-> Stream output
+    assign vid_in_clk = CAM0_CLK;
+    assign vid_in_resetn = vid_resetn;
     
+    wire vid_clk;
+    assign vid_clk = CAM0_CLK;
+
+    reg hsync_dly;
+    reg vsync_dly;
+
+    always @(posedge vid_clk)
+    begin
+        hsync_dly <= CAM0_HSYNC;
+        vsync_dly <= CAM0_VSYNC;
+    end
+
+    // start of line handle
+    wire start_of_line_w;
+    assign start_of_line_w = ~hsync_dly && CAM0_HSYNC;
+
+    // end of line handle
+    wire end_of_line_w;
+    assign end_of_line_w = hsync_dly && ~CAM0_HSYNC;
+
+    // start of frame handle
+    wire start_of_frame_w;
+    assign start_of_frame_w = ~vsync_dly && CAM0_VSYNC;
+
+    // Keep until first byte send
+    reg start_of_frame;
+
+    always @(posedge vid_clk)
+        if (hsync_dly)
+            start_of_frame <= 1'b0;
+        else if (start_of_frame_w)
+            start_of_frame <= 1'b1;
+
+    // data handle
+    reg [7:0] dataword;
+
+    always @(posedge vid_clk)
+        dataword <= CAM0_D;
+
+    assign vid_in_tvalid = hsync_dly;
+    assign vid_in_tdata = dataword;
+    assign vid_in_tlast = end_of_line_w;
+    assign vid_in_tuser = start_of_frame;
+    assign vid_in_tkeep = 1'b1;
+    assign vid_in_tstrb = 1'b1;
+    assign vid_in_tdest = 1'b0;
+    assign vid_in_tid = 1'b0;
+
 endmodule

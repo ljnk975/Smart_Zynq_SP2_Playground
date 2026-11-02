@@ -127,6 +127,12 @@
         };
     };
     */
+
+    clk_ext_camera: camera-clock-osc24m {
+        compatible = "fixed-clock";
+        #clock-cells = <0>;
+        clock-frequency = <24000000>;
+    };
 };
 
 &usb0 {
@@ -185,4 +191,40 @@
 
 &mixer_crtcHDMI_SUB_v_mix_0 {
     remote-endpoint = <&hdmi_encoder>;
+};
+
+&CAMERA_SUB_v_frmbuf_wr_0 {
+    reset-gpios = <&CAMERA_SUB_axi_gpio_0 8 0>; // GPIO_ACTIVE_HIGH
+};
+
+&CAMERA_SUB_v_demosaic_0 {
+    reset-gpios = <&CAMERA_SUB_axi_gpio_0 9 0>; // GPIO_ACTIVE_HIGH
+};
+
+&demosaic_port0CAMERA_SUB_v_demosaic_0 {
+	demo_in: endpoint {
+		remote-endpoint = <&camera_out>;
+	};
+};
+
+&CAMERA_SUB_axi_iic_0 {
+    camera@3c {
+        compatible = "ovti,ov5640";
+        reg = <0x3c>;
+        clocks = <&clk_ext_camera>;
+        clock-names = "xclk";
+        powerdown-gpios = <&CAMERA_SUB_axi_gpio_0 0 0>; // GPIO_ACTIVE_HIGH
+        reset-gpios = <&CAMERA_SUB_axi_gpio_0 1 1>; // GPIO_ACTIVE_LOW
+
+        port {
+            camera_out: endpoint {
+                remote-endpoint = <&demo_in>;
+                bus-width = <8>;
+                data-shift = <2>; // lines 9:2 are used
+                hsync-active = <0>;
+                vsync-active = <0>;
+                pclk-sample = <1>;
+            };
+        };
+    };
 };
