@@ -23,9 +23,15 @@ It can:
 ![HDMI 1](image/hdmi_1.jpg)
 ![HDMI 2](image/hdmi_2.jpg)
 
+- Play with OV5640 camera with max IO frequency 100MHz
+
 # How to build?
 
 See [BUILDING](BUILDING.md)
+
+# Little bit about design
+
+See [DESIGN](DESIGN.md)
 
 # Licence and copyright
 
